@@ -1,11 +1,17 @@
 /********************************** (C) COPYRIGHT *******************************
-* File Name		: I2C.H
-* Author		: Zhiyuan Wan
-* License		: MIT
-* Version		: V1.0
-* Date			: 2018/03/17
+* File Name     : I2C.H
+* Author        : Zhiyuan Wan
+* License       : MIT
+* Version       : V1.0
+* Date          : 2018/03/17
 * Description   : 8051 Software I2C
+********************************************************************************
+* Modified      : Paul Raspa (PR77)
+* License       : MIT
+* Version       : V2.0
+* Date          : 2024/12/17
 *******************************************************************************/
+
 #ifndef __CH554_I2C_CFG_H__
 #define __CH554_I2C_CFG_H__
 

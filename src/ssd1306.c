@@ -1,3 +1,12 @@
+/********************************** (C) COPYRIGHT *******************************
+* File Name     : SSD1306.C
+* Author        : Paul Raspa (PR77)
+* License       : MIT
+* Version       : V1.0
+* Date          : 2024/12/17
+* Description   : SSD1306 Driver
+*******************************************************************************/
+
 #include <stdint.h>
 #include <compiler.h>
 #include "ch554.h"

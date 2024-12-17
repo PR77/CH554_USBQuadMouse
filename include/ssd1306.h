@@ -1,3 +1,12 @@
+/********************************** (C) COPYRIGHT *******************************
+* File Name     : SSD1306.H
+* Author        : Paul Raspa (PR77)
+* License       : MIT
+* Version       : V1.0
+* Date          : 2024/12/17
+* Description   : SSD1306 Driver
+*******************************************************************************/
+
 #ifndef __CH554_SSD1306_H__
 #define __CH554_SSD1306_H__
 

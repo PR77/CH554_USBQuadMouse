@@ -1,3 +1,17 @@
+/********************************** (C) COPYRIGHT *******************************
+* File Name     : SYSTEM.C
+* Author        : Zhiyuan Wan
+* License       : MIT
+* Version       : V1.0
+* Date          : 2018/03/17
+* Description   : 8051 System Functions
+********************************************************************************
+* Modified      : Paul Raspa (PR77)
+* License       : MIT
+* Version       : V2.0
+* Date          : 2024/12/17
+*******************************************************************************/
+
 #ifndef __CH554_SYSTEM_H__
 #define __CH554_SYSTEM_H__
 

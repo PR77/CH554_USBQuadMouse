@@ -1,3 +1,12 @@
+/********************************** (C) COPYRIGHT *******************************
+* File Name     : TICK.c
+* Author        : Paul Raspa (PR77)
+* License       : MIT
+* Version       : V1.0
+* Date          : 2024/12/17
+* Description   : Timer 0 Tick
+*******************************************************************************/
+
 #include <stdint.h>
 #include <compiler.h>
 #include "ch554.h"
