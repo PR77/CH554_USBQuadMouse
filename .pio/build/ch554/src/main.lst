@@ -1,0 +1,1178 @@
+                                      1 ;--------------------------------------------------------
+                                      2 ; File Created by SDCC : free open source ISO C Compiler 
+                                      3 ; Version 4.4.0 #14620 (MINGW32)
+                                      4 ;--------------------------------------------------------
+                                      5 	.module main
+                                      6 	.optsdcc -mmcs51 --model-small
+                                      7 	
+                                      8 ;--------------------------------------------------------
+                                      9 ; Public variables in this module
+                                     10 ;--------------------------------------------------------
+                                     11 	.globl _main
+                                     12 	.globl _InitUSB_Host
+                                     13 	.globl _SearchTypeDevice
+                                     14 	.globl _EnumAllRootDevice
+                                     15 	.globl _USBHostTransact
+                                     16 	.globl _SelectHubPort
+                                     17 	.globl _SetUsbSpeed
+                                     18 	.globl _AnalyzeRootHub
+                                     19 	.globl _memset
+                                     20 	.globl _ssd1306_clearScreen
+                                     21 	.globl _ssd1306_setCursor
+                                     22 	.globl _ssd1306_printHexWord
+                                     23 	.globl _ssd1306_printHexByte
+                                     24 	.globl _ssd1306_printString
+                                     25 	.globl _ssd1306_initialise
+                                     26 	.globl _i2c_initialise
+                                     27 	.globl _tick_get1msTimerCount
+                                     28 	.globl _tick_enableTimer0Interrupt
+                                     29 	.globl _tick_startTimer0
+                                     30 	.globl _tick_initialiseTimer0
+                                     31 	.globl _system_CfgFsys
+                                     32 	.globl _LED
+                                     33 	.globl _EnableIAP
+                                     34 	.globl _UIF_BUS_RST
+                                     35 	.globl _UIF_DETECT
+                                     36 	.globl _UIF_TRANSFER
+                                     37 	.globl _UIF_SUSPEND
+                                     38 	.globl _UIF_HST_SOF
+                                     39 	.globl _UIF_FIFO_OV
+                                     40 	.globl _U_SIE_FREE
+                                     41 	.globl _U_TOG_OK
+                                     42 	.globl _U_IS_NAK
+                                     43 	.globl _ADC_CHAN0
+                                     44 	.globl _ADC_CHAN1
+                                     45 	.globl _CMP_CHAN
+                                     46 	.globl _ADC_START
+                                     47 	.globl _ADC_IF
+                                     48 	.globl _CMP_IF
+                                     49 	.globl _CMPO
+                                     50 	.globl _U1RI
+                                     51 	.globl _U1TI
+                                     52 	.globl _U1RB8
+                                     53 	.globl _U1TB8
+                                     54 	.globl _U1REN
+                                     55 	.globl _U1SMOD
+                                     56 	.globl _U1SM0
+                                     57 	.globl _S0_R_FIFO
+                                     58 	.globl _S0_T_FIFO
+                                     59 	.globl _S0_FREE
+                                     60 	.globl _S0_IF_BYTE
+                                     61 	.globl _S0_IF_FIRST
+                                     62 	.globl _S0_IF_OV
+                                     63 	.globl _S0_FST_ACT
+                                     64 	.globl _CP_RL2
+                                     65 	.globl _C_T2
+                                     66 	.globl _TR2
+                                     67 	.globl _EXEN2
+                                     68 	.globl _TCLK
+                                     69 	.globl _RCLK
+                                     70 	.globl _EXF2
+                                     71 	.globl _CAP1F
+                                     72 	.globl _TF2
+                                     73 	.globl _RI
+                                     74 	.globl _TI
+                                     75 	.globl _RB8
+                                     76 	.globl _TB8
+                                     77 	.globl _REN
+                                     78 	.globl _SM2
+                                     79 	.globl _SM1
+                                     80 	.globl _SM0
+                                     81 	.globl _IT0
+                                     82 	.globl _IE0
+                                     83 	.globl _IT1
+                                     84 	.globl _IE1
+                                     85 	.globl _TR0
+                                     86 	.globl _TF0
+                                     87 	.globl _TR1
+                                     88 	.globl _TF1
+                                     89 	.globl _RXD
+                                     90 	.globl _PWM1_
+                                     91 	.globl _TXD
+                                     92 	.globl _PWM2_
+                                     93 	.globl _AIN3
+                                     94 	.globl _VBUS1
+                                     95 	.globl _INT0
+                                     96 	.globl _TXD1_
+                                     97 	.globl _INT1
+                                     98 	.globl _T0
+                                     99 	.globl _RXD1_
+                                    100 	.globl _PWM2
+                                    101 	.globl _T1
+                                    102 	.globl _UDP
+                                    103 	.globl _UDM
+                                    104 	.globl _TIN0
+                                    105 	.globl _CAP1
+                                    106 	.globl _T2
+                                    107 	.globl _AIN0
+                                    108 	.globl _VBUS2
+                                    109 	.globl _TIN1
+                                    110 	.globl _CAP2
+                                    111 	.globl _T2EX
+                                    112 	.globl _RXD_
+                                    113 	.globl _TXD_
+                                    114 	.globl _AIN1
+                                    115 	.globl _UCC1
+                                    116 	.globl _TIN2
+                                    117 	.globl _SCS
+                                    118 	.globl _CAP1_
+                                    119 	.globl _T2_
+                                    120 	.globl _AIN2
+                                    121 	.globl _UCC2
+                                    122 	.globl _TIN3
+                                    123 	.globl _PWM1
+                                    124 	.globl _MOSI
+                                    125 	.globl _TIN4
+                                    126 	.globl _RXD1
+                                    127 	.globl _MISO
+                                    128 	.globl _TIN5
+                                    129 	.globl _TXD1
+                                    130 	.globl _SCK
+                                    131 	.globl _IE_SPI0
+                                    132 	.globl _IE_TKEY
+                                    133 	.globl _IE_USB
+                                    134 	.globl _IE_ADC
+                                    135 	.globl _IE_UART1
+                                    136 	.globl _IE_PWMX
+                                    137 	.globl _IE_GPIO
+                                    138 	.globl _IE_WDOG
+                                    139 	.globl _PX0
+                                    140 	.globl _PT0
+                                    141 	.globl _PX1
+                                    142 	.globl _PT1
+                                    143 	.globl _PS
+                                    144 	.globl _PT2
+                                    145 	.globl _PL_FLAG
+                                    146 	.globl _PH_FLAG
+                                    147 	.globl _EX0
+                                    148 	.globl _ET0
+                                    149 	.globl _EX1
+                                    150 	.globl _ET1
+                                    151 	.globl _ES
+                                    152 	.globl _ET2
+                                    153 	.globl _E_DIS
+                                    154 	.globl _EA
+                                    155 	.globl _P
+                                    156 	.globl _F1
+                                    157 	.globl _OV
+                                    158 	.globl _RS0
+                                    159 	.globl _RS1
+                                    160 	.globl _F0
+                                    161 	.globl _AC
+                                    162 	.globl _CY
+                                    163 	.globl _UEP1_DMA_H
+                                    164 	.globl _UEP1_DMA_L
+                                    165 	.globl _UEP1_DMA
+                                    166 	.globl _UEP0_DMA_H
+                                    167 	.globl _UEP0_DMA_L
+                                    168 	.globl _UEP0_DMA
+                                    169 	.globl _UEP2_3_MOD
+                                    170 	.globl _UEP4_1_MOD
+                                    171 	.globl _UEP3_DMA_H
+                                    172 	.globl _UEP3_DMA_L
+                                    173 	.globl _UEP3_DMA
+                                    174 	.globl _UEP2_DMA_H
+                                    175 	.globl _UEP2_DMA_L
+                                    176 	.globl _UEP2_DMA
+                                    177 	.globl _USB_DEV_AD
+                                    178 	.globl _USB_CTRL
+                                    179 	.globl _USB_INT_EN
+                                    180 	.globl _UEP4_T_LEN
+                                    181 	.globl _UEP4_CTRL
+                                    182 	.globl _UEP0_T_LEN
+                                    183 	.globl _UEP0_CTRL
+                                    184 	.globl _USB_RX_LEN
+                                    185 	.globl _USB_MIS_ST
+                                    186 	.globl _USB_INT_ST
+                                    187 	.globl _USB_INT_FG
+                                    188 	.globl _UEP3_T_LEN
+                                    189 	.globl _UEP3_CTRL
+                                    190 	.globl _UEP2_T_LEN
+                                    191 	.globl _UEP2_CTRL
+                                    192 	.globl _UEP1_T_LEN
+                                    193 	.globl _UEP1_CTRL
+                                    194 	.globl _UDEV_CTRL
+                                    195 	.globl _USB_C_CTRL
+                                    196 	.globl _TKEY_DATH
+                                    197 	.globl _TKEY_DATL
+                                    198 	.globl _TKEY_DAT
+                                    199 	.globl _TKEY_CTRL
+                                    200 	.globl _ADC_DATA
+                                    201 	.globl _ADC_CFG
+                                    202 	.globl _ADC_CTRL
+                                    203 	.globl _SBAUD1
+                                    204 	.globl _SBUF1
+                                    205 	.globl _SCON1
+                                    206 	.globl _SPI0_SETUP
+                                    207 	.globl _SPI0_CK_SE
+                                    208 	.globl _SPI0_CTRL
+                                    209 	.globl _SPI0_DATA
+                                    210 	.globl _SPI0_STAT
+                                    211 	.globl _PWM_CK_SE
+                                    212 	.globl _PWM_CTRL
+                                    213 	.globl _PWM_DATA1
+                                    214 	.globl _PWM_DATA2
+                                    215 	.globl _T2CAP1H
+                                    216 	.globl _T2CAP1L
+                                    217 	.globl _T2CAP1
+                                    218 	.globl _TH2
+                                    219 	.globl _TL2
+                                    220 	.globl _T2COUNT
+                                    221 	.globl _RCAP2H
+                                    222 	.globl _RCAP2L
+                                    223 	.globl _RCAP2
+                                    224 	.globl _T2MOD
+                                    225 	.globl _T2CON
+                                    226 	.globl _SBUF
+                                    227 	.globl _SCON
+                                    228 	.globl _TH1
+                                    229 	.globl _TH0
+                                    230 	.globl _TL1
+                                    231 	.globl _TL0
+                                    232 	.globl _TMOD
+                                    233 	.globl _TCON
+                                    234 	.globl _XBUS_AUX
+                                    235 	.globl _PIN_FUNC
+                                    236 	.globl _P3_DIR_PU
+                                    237 	.globl _P3_MOD_OC
+                                    238 	.globl _P3
+                                    239 	.globl _P2
+                                    240 	.globl _P1_DIR_PU
+                                    241 	.globl _P1_MOD_OC
+                                    242 	.globl _P1
+                                    243 	.globl _ROM_CTRL
+                                    244 	.globl _ROM_DATA_H
+                                    245 	.globl _ROM_DATA_L
+                                    246 	.globl _ROM_DATA
+                                    247 	.globl _ROM_ADDR_H
+                                    248 	.globl _ROM_ADDR_L
+                                    249 	.globl _ROM_ADDR
+                                    250 	.globl _GPIO_IE
+                                    251 	.globl _IP_EX
+                                    252 	.globl _IE_EX
+                                    253 	.globl _IP
+                                    254 	.globl _IE
+                                    255 	.globl _WDOG_COUNT
+                                    256 	.globl _RESET_KEEP
+                                    257 	.globl _WAKE_CTRL
+                                    258 	.globl _CLOCK_CFG
+                                    259 	.globl _PCON
+                                    260 	.globl _GLOBAL_CFG
+                                    261 	.globl _SAFE_MOD
+                                    262 	.globl _DPH
+                                    263 	.globl _DPL
+                                    264 	.globl _SP
+                                    265 	.globl _B
+                                    266 	.globl _ACC
+                                    267 	.globl _PSW
+                                    268 	.globl _bootloader
+                                    269 ;--------------------------------------------------------
+                                    270 ; special function registers
+                                    271 ;--------------------------------------------------------
+                                    272 	.area RSEG    (ABS,DATA)
+      000000                        273 	.org 0x0000
+                           0000D0   274 _PSW	=	0x00d0
+                           0000E0   275 _ACC	=	0x00e0
+                           0000F0   276 _B	=	0x00f0
+                           000081   277 _SP	=	0x0081
+                           000082   278 _DPL	=	0x0082
+                           000083   279 _DPH	=	0x0083
+                           0000A1   280 _SAFE_MOD	=	0x00a1
+                           0000B1   281 _GLOBAL_CFG	=	0x00b1
+                           000087   282 _PCON	=	0x0087
+                           0000B9   283 _CLOCK_CFG	=	0x00b9
+                           0000A9   284 _WAKE_CTRL	=	0x00a9
+                           0000FE   285 _RESET_KEEP	=	0x00fe
+                           0000FF   286 _WDOG_COUNT	=	0x00ff
+                           0000A8   287 _IE	=	0x00a8
+                           0000B8   288 _IP	=	0x00b8
+                           0000E8   289 _IE_EX	=	0x00e8
+                           0000E9   290 _IP_EX	=	0x00e9
+                           0000C7   291 _GPIO_IE	=	0x00c7
+                           008584   292 _ROM_ADDR	=	0x8584
+                           000084   293 _ROM_ADDR_L	=	0x0084
+                           000085   294 _ROM_ADDR_H	=	0x0085
+                           008F8E   295 _ROM_DATA	=	0x8f8e
+                           00008E   296 _ROM_DATA_L	=	0x008e
+                           00008F   297 _ROM_DATA_H	=	0x008f
+                           000086   298 _ROM_CTRL	=	0x0086
+                           000090   299 _P1	=	0x0090
+                           000092   300 _P1_MOD_OC	=	0x0092
+                           000093   301 _P1_DIR_PU	=	0x0093
+                           0000A0   302 _P2	=	0x00a0
+                           0000B0   303 _P3	=	0x00b0
+                           000096   304 _P3_MOD_OC	=	0x0096
+                           000097   305 _P3_DIR_PU	=	0x0097
+                           0000C6   306 _PIN_FUNC	=	0x00c6
+                           0000A2   307 _XBUS_AUX	=	0x00a2
+                           000088   308 _TCON	=	0x0088
+                           000089   309 _TMOD	=	0x0089
+                           00008A   310 _TL0	=	0x008a
+                           00008B   311 _TL1	=	0x008b
+                           00008C   312 _TH0	=	0x008c
+                           00008D   313 _TH1	=	0x008d
+                           000098   314 _SCON	=	0x0098
+                           000099   315 _SBUF	=	0x0099
+                           0000C8   316 _T2CON	=	0x00c8
+                           0000C9   317 _T2MOD	=	0x00c9
+                           00CBCA   318 _RCAP2	=	0xcbca
+                           0000CA   319 _RCAP2L	=	0x00ca
+                           0000CB   320 _RCAP2H	=	0x00cb
+                           00CDCC   321 _T2COUNT	=	0xcdcc
+                           0000CC   322 _TL2	=	0x00cc
+                           0000CD   323 _TH2	=	0x00cd
+                           00CFCE   324 _T2CAP1	=	0xcfce
+                           0000CE   325 _T2CAP1L	=	0x00ce
+                           0000CF   326 _T2CAP1H	=	0x00cf
+                           00009B   327 _PWM_DATA2	=	0x009b
+                           00009C   328 _PWM_DATA1	=	0x009c
+                           00009D   329 _PWM_CTRL	=	0x009d
+                           00009E   330 _PWM_CK_SE	=	0x009e
+                           0000F8   331 _SPI0_STAT	=	0x00f8
+                           0000F9   332 _SPI0_DATA	=	0x00f9
+                           0000FA   333 _SPI0_CTRL	=	0x00fa
+                           0000FB   334 _SPI0_CK_SE	=	0x00fb
+                           0000FC   335 _SPI0_SETUP	=	0x00fc
+                           0000C0   336 _SCON1	=	0x00c0
+                           0000C1   337 _SBUF1	=	0x00c1
+                           0000C2   338 _SBAUD1	=	0x00c2
+                           000080   339 _ADC_CTRL	=	0x0080
+                           00009A   340 _ADC_CFG	=	0x009a
+                           00009F   341 _ADC_DATA	=	0x009f
+                           0000C3   342 _TKEY_CTRL	=	0x00c3
+                           00C5C4   343 _TKEY_DAT	=	0xc5c4
+                           0000C4   344 _TKEY_DATL	=	0x00c4
+                           0000C5   345 _TKEY_DATH	=	0x00c5
+                           000091   346 _USB_C_CTRL	=	0x0091
+                           0000D1   347 _UDEV_CTRL	=	0x00d1
+                           0000D2   348 _UEP1_CTRL	=	0x00d2
+                           0000D3   349 _UEP1_T_LEN	=	0x00d3
+                           0000D4   350 _UEP2_CTRL	=	0x00d4
+                           0000D5   351 _UEP2_T_LEN	=	0x00d5
+                           0000D6   352 _UEP3_CTRL	=	0x00d6
+                           0000D7   353 _UEP3_T_LEN	=	0x00d7
+                           0000D8   354 _USB_INT_FG	=	0x00d8
+                           0000D9   355 _USB_INT_ST	=	0x00d9
+                           0000DA   356 _USB_MIS_ST	=	0x00da
+                           0000DB   357 _USB_RX_LEN	=	0x00db
+                           0000DC   358 _UEP0_CTRL	=	0x00dc
+                           0000DD   359 _UEP0_T_LEN	=	0x00dd
+                           0000DE   360 _UEP4_CTRL	=	0x00de
+                           0000DF   361 _UEP4_T_LEN	=	0x00df
+                           0000E1   362 _USB_INT_EN	=	0x00e1
+                           0000E2   363 _USB_CTRL	=	0x00e2
+                           0000E3   364 _USB_DEV_AD	=	0x00e3
+                           00E5E4   365 _UEP2_DMA	=	0xe5e4
+                           0000E4   366 _UEP2_DMA_L	=	0x00e4
+                           0000E5   367 _UEP2_DMA_H	=	0x00e5
+                           00E7E6   368 _UEP3_DMA	=	0xe7e6
+                           0000E6   369 _UEP3_DMA_L	=	0x00e6
+                           0000E7   370 _UEP3_DMA_H	=	0x00e7
+                           0000EA   371 _UEP4_1_MOD	=	0x00ea
+                           0000EB   372 _UEP2_3_MOD	=	0x00eb
+                           00EDEC   373 _UEP0_DMA	=	0xedec
+                           0000EC   374 _UEP0_DMA_L	=	0x00ec
+                           0000ED   375 _UEP0_DMA_H	=	0x00ed
+                           00EFEE   376 _UEP1_DMA	=	0xefee
+                           0000EE   377 _UEP1_DMA_L	=	0x00ee
+                           0000EF   378 _UEP1_DMA_H	=	0x00ef
+                                    379 ;--------------------------------------------------------
+                                    380 ; special function bits
+                                    381 ;--------------------------------------------------------
+                                    382 	.area RSEG    (ABS,DATA)
+      000000                        383 	.org 0x0000
+                           0000D7   384 _CY	=	0x00d7
+                           0000D6   385 _AC	=	0x00d6
+                           0000D5   386 _F0	=	0x00d5
+                           0000D4   387 _RS1	=	0x00d4
+                           0000D3   388 _RS0	=	0x00d3
+                           0000D2   389 _OV	=	0x00d2
+                           0000D1   390 _F1	=	0x00d1
+                           0000D0   391 _P	=	0x00d0
+                           0000AF   392 _EA	=	0x00af
+                           0000AE   393 _E_DIS	=	0x00ae
+                           0000AD   394 _ET2	=	0x00ad
+                           0000AC   395 _ES	=	0x00ac
+                           0000AB   396 _ET1	=	0x00ab
+                           0000AA   397 _EX1	=	0x00aa
+                           0000A9   398 _ET0	=	0x00a9
+                           0000A8   399 _EX0	=	0x00a8
+                           0000BF   400 _PH_FLAG	=	0x00bf
+                           0000BE   401 _PL_FLAG	=	0x00be
+                           0000BD   402 _PT2	=	0x00bd
+                           0000BC   403 _PS	=	0x00bc
+                           0000BB   404 _PT1	=	0x00bb
+                           0000BA   405 _PX1	=	0x00ba
+                           0000B9   406 _PT0	=	0x00b9
+                           0000B8   407 _PX0	=	0x00b8
+                           0000EF   408 _IE_WDOG	=	0x00ef
+                           0000EE   409 _IE_GPIO	=	0x00ee
+                           0000ED   410 _IE_PWMX	=	0x00ed
+                           0000EC   411 _IE_UART1	=	0x00ec
+                           0000EB   412 _IE_ADC	=	0x00eb
+                           0000EA   413 _IE_USB	=	0x00ea
+                           0000E9   414 _IE_TKEY	=	0x00e9
+                           0000E8   415 _IE_SPI0	=	0x00e8
+                           000097   416 _SCK	=	0x0097
+                           000097   417 _TXD1	=	0x0097
+                           000097   418 _TIN5	=	0x0097
+                           000096   419 _MISO	=	0x0096
+                           000096   420 _RXD1	=	0x0096
+                           000096   421 _TIN4	=	0x0096
+                           000095   422 _MOSI	=	0x0095
+                           000095   423 _PWM1	=	0x0095
+                           000095   424 _TIN3	=	0x0095
+                           000095   425 _UCC2	=	0x0095
+                           000095   426 _AIN2	=	0x0095
+                           000094   427 _T2_	=	0x0094
+                           000094   428 _CAP1_	=	0x0094
+                           000094   429 _SCS	=	0x0094
+                           000094   430 _TIN2	=	0x0094
+                           000094   431 _UCC1	=	0x0094
+                           000094   432 _AIN1	=	0x0094
+                           000093   433 _TXD_	=	0x0093
+                           000092   434 _RXD_	=	0x0092
+                           000091   435 _T2EX	=	0x0091
+                           000091   436 _CAP2	=	0x0091
+                           000091   437 _TIN1	=	0x0091
+                           000091   438 _VBUS2	=	0x0091
+                           000091   439 _AIN0	=	0x0091
+                           000090   440 _T2	=	0x0090
+                           000090   441 _CAP1	=	0x0090
+                           000090   442 _TIN0	=	0x0090
+                           0000B7   443 _UDM	=	0x00b7
+                           0000B6   444 _UDP	=	0x00b6
+                           0000B5   445 _T1	=	0x00b5
+                           0000B4   446 _PWM2	=	0x00b4
+                           0000B4   447 _RXD1_	=	0x00b4
+                           0000B4   448 _T0	=	0x00b4
+                           0000B3   449 _INT1	=	0x00b3
+                           0000B2   450 _TXD1_	=	0x00b2
+                           0000B2   451 _INT0	=	0x00b2
+                           0000B2   452 _VBUS1	=	0x00b2
+                           0000B2   453 _AIN3	=	0x00b2
+                           0000B1   454 _PWM2_	=	0x00b1
+                           0000B1   455 _TXD	=	0x00b1
+                           0000B0   456 _PWM1_	=	0x00b0
+                           0000B0   457 _RXD	=	0x00b0
+                           00008F   458 _TF1	=	0x008f
+                           00008E   459 _TR1	=	0x008e
+                           00008D   460 _TF0	=	0x008d
+                           00008C   461 _TR0	=	0x008c
+                           00008B   462 _IE1	=	0x008b
+                           00008A   463 _IT1	=	0x008a
+                           000089   464 _IE0	=	0x0089
+                           000088   465 _IT0	=	0x0088
+                           00009F   466 _SM0	=	0x009f
+                           00009E   467 _SM1	=	0x009e
+                           00009D   468 _SM2	=	0x009d
+                           00009C   469 _REN	=	0x009c
+                           00009B   470 _TB8	=	0x009b
+                           00009A   471 _RB8	=	0x009a
+                           000099   472 _TI	=	0x0099
+                           000098   473 _RI	=	0x0098
+                           0000CF   474 _TF2	=	0x00cf
+                           0000CF   475 _CAP1F	=	0x00cf
+                           0000CE   476 _EXF2	=	0x00ce
+                           0000CD   477 _RCLK	=	0x00cd
+                           0000CC   478 _TCLK	=	0x00cc
+                           0000CB   479 _EXEN2	=	0x00cb
+                           0000CA   480 _TR2	=	0x00ca
+                           0000C9   481 _C_T2	=	0x00c9
+                           0000C8   482 _CP_RL2	=	0x00c8
+                           0000FF   483 _S0_FST_ACT	=	0x00ff
+                           0000FE   484 _S0_IF_OV	=	0x00fe
+                           0000FD   485 _S0_IF_FIRST	=	0x00fd
+                           0000FC   486 _S0_IF_BYTE	=	0x00fc
+                           0000FB   487 _S0_FREE	=	0x00fb
+                           0000FA   488 _S0_T_FIFO	=	0x00fa
+                           0000F8   489 _S0_R_FIFO	=	0x00f8
+                           0000C7   490 _U1SM0	=	0x00c7
+                           0000C5   491 _U1SMOD	=	0x00c5
+                           0000C4   492 _U1REN	=	0x00c4
+                           0000C3   493 _U1TB8	=	0x00c3
+                           0000C2   494 _U1RB8	=	0x00c2
+                           0000C1   495 _U1TI	=	0x00c1
+                           0000C0   496 _U1RI	=	0x00c0
+                           000087   497 _CMPO	=	0x0087
+                           000086   498 _CMP_IF	=	0x0086
+                           000085   499 _ADC_IF	=	0x0085
+                           000084   500 _ADC_START	=	0x0084
+                           000083   501 _CMP_CHAN	=	0x0083
+                           000081   502 _ADC_CHAN1	=	0x0081
+                           000080   503 _ADC_CHAN0	=	0x0080
+                           0000DF   504 _U_IS_NAK	=	0x00df
+                           0000DE   505 _U_TOG_OK	=	0x00de
+                           0000DD   506 _U_SIE_FREE	=	0x00dd
+                           0000DC   507 _UIF_FIFO_OV	=	0x00dc
+                           0000DB   508 _UIF_HST_SOF	=	0x00db
+                           0000DA   509 _UIF_SUSPEND	=	0x00da
+                           0000D9   510 _UIF_TRANSFER	=	0x00d9
+                           0000D8   511 _UIF_DETECT	=	0x00d8
+                           0000D8   512 _UIF_BUS_RST	=	0x00d8
+                           000090   513 _EnableIAP	=	0x0090
+                           000094   514 _LED	=	0x0094
+                                    515 ;--------------------------------------------------------
+                                    516 ; overlayable register banks
+                                    517 ;--------------------------------------------------------
+                                    518 	.area REG_BANK_0	(REL,OVR,DATA)
+      000000                        519 	.ds 8
+                                    520 ;--------------------------------------------------------
+                                    521 ; internal ram data
+                                    522 ;--------------------------------------------------------
+                                    523 	.area DSEG    (DATA)
+      000000                        524 _bootloader::
+      000000                        525 	.ds 2
+      000002                        526 _main_previousCountLEDFlash_10000_111:
+      000002                        527 	.ds 4
+      000006                        528 _main_previousCountUSBTransfer_10000_111:
+      000006                        529 	.ds 4
+                                    530 ;--------------------------------------------------------
+                                    531 ; overlayable items in internal ram
+                                    532 ;--------------------------------------------------------
+                                    533 ;--------------------------------------------------------
+                                    534 ; Stack segment in internal ram
+                                    535 ;--------------------------------------------------------
+                                    536 	.area SSEG
+      000000                        537 __start__stack:
+      000000                        538 	.ds	1
+                                    539 
+                                    540 ;--------------------------------------------------------
+                                    541 ; indirectly addressable internal ram data
+                                    542 ;--------------------------------------------------------
+                                    543 	.area ISEG    (DATA)
+                                    544 ;--------------------------------------------------------
+                                    545 ; absolute internal ram data
+                                    546 ;--------------------------------------------------------
+                                    547 	.area IABS    (ABS,DATA)
+                                    548 	.area IABS    (ABS,DATA)
+                                    549 ;--------------------------------------------------------
+                                    550 ; bit data
+                                    551 ;--------------------------------------------------------
+                                    552 	.area BSEG    (BIT)
+                                    553 ;--------------------------------------------------------
+                                    554 ; paged external ram data
+                                    555 ;--------------------------------------------------------
+                                    556 	.area PSEG    (PAG,XDATA)
+                                    557 ;--------------------------------------------------------
+                                    558 ; uninitialized external ram data
+                                    559 ;--------------------------------------------------------
+                                    560 	.area XSEG    (XDATA)
+                                    561 ;--------------------------------------------------------
+                                    562 ; absolute external ram data
+                                    563 ;--------------------------------------------------------
+                                    564 	.area XABS    (ABS,XDATA)
+                                    565 ;--------------------------------------------------------
+                                    566 ; initialized external ram data
+                                    567 ;--------------------------------------------------------
+                                    568 	.area XISEG   (XDATA)
+                                    569 	.area HOME    (CODE)
+                                    570 	.area GSINIT0 (CODE)
+                                    571 	.area GSINIT1 (CODE)
+                                    572 	.area GSINIT2 (CODE)
+                                    573 	.area GSINIT3 (CODE)
+                                    574 	.area GSINIT4 (CODE)
+                                    575 	.area GSINIT5 (CODE)
+                                    576 	.area GSINIT  (CODE)
+                                    577 	.area GSFINAL (CODE)
+                                    578 	.area CSEG    (CODE)
+                                    579 ;--------------------------------------------------------
+                                    580 ; interrupt vector
+                                    581 ;--------------------------------------------------------
+                                    582 	.area HOME    (CODE)
+      000000                        583 __interrupt_vect:
+      000000 02r00r00         [24]  584 	ljmp	__sdcc_gsinit_startup
+      000003 32               [24]  585 	reti
+      000004                        586 	.ds	7
+      00000B 02r00r00         [24]  587 	ljmp	_tick_timer0Interrupt
+                                    588 ;--------------------------------------------------------
+                                    589 ; global & static initialisations
+                                    590 ;--------------------------------------------------------
+                                    591 	.area HOME    (CODE)
+                                    592 	.area GSINIT  (CODE)
+                                    593 	.area GSFINAL (CODE)
+                                    594 	.area GSINIT  (CODE)
+                                    595 	.globl __sdcc_gsinit_startup
+                                    596 	.globl __sdcc_program_startup
+                                    597 	.globl __start__stack
+                                    598 	.globl __mcs51_genXINIT
+                                    599 	.globl __mcs51_genXRAMCLEAR
+                                    600 	.globl __mcs51_genRAMCLEAR
+                                    601 ;------------------------------------------------------------
+                                    602 ;Allocation info for local variables in function 'main'
+                                    603 ;------------------------------------------------------------
+                                    604 ;previousCountLEDFlash     Allocated with name '_main_previousCountLEDFlash_10000_111'
+                                    605 ;previousCountUSBTransfer  Allocated with name '_main_previousCountUSBTransfer_10000_111'
+                                    606 ;usbStatus                 Allocated to registers r7 
+                                    607 ;i                         Allocated to registers r6 
+                                    608 ;len                       Allocated to registers r7 
+                                    609 ;endp                      Allocated to registers r5 
+                                    610 ;usbLocation               Allocated to registers r6 r7 
+                                    611 ;------------------------------------------------------------
+                                    612 ;	src\main.c:25: static uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;
+      000000 E4               [12]  613 	clr	a
+      000001 F5*02            [12]  614 	mov	_main_previousCountLEDFlash_10000_111,a
+      000003 F5*03            [12]  615 	mov	(_main_previousCountLEDFlash_10000_111 + 1),a
+      000005 F5*04            [12]  616 	mov	(_main_previousCountLEDFlash_10000_111 + 2),a
+      000007 F5*05            [12]  617 	mov	(_main_previousCountLEDFlash_10000_111 + 3),a
+      000009 F5*06            [12]  618 	mov	_main_previousCountUSBTransfer_10000_111,a
+      00000B F5*07            [12]  619 	mov	(_main_previousCountUSBTransfer_10000_111 + 1),a
+      00000D F5*08            [12]  620 	mov	(_main_previousCountUSBTransfer_10000_111 + 2),a
+      00000F F5*09            [12]  621 	mov	(_main_previousCountUSBTransfer_10000_111 + 3),a
+                                    622 ;	include/bootloader.h:5: void (* __data bootloader)(void) = BOOT_ADDR;
+      000011 F5*00            [12]  623 	mov	_bootloader,a
+      000013 75*01 38         [24]  624 	mov	(_bootloader + 1),#0x38
+                                    625 	.area GSFINAL (CODE)
+      000000 02r00r0E         [24]  626 	ljmp	__sdcc_program_startup
+                                    627 ;--------------------------------------------------------
+                                    628 ; Home
+                                    629 ;--------------------------------------------------------
+                                    630 	.area HOME    (CODE)
+                                    631 	.area HOME    (CODE)
+      00000E                        632 __sdcc_program_startup:
+      00000E 02r00r00         [24]  633 	ljmp	_main
+                                    634 ;	return from main will return to caller
+                                    635 ;--------------------------------------------------------
+                                    636 ; code
+                                    637 ;--------------------------------------------------------
+                                    638 	.area CSEG    (CODE)
+                                    639 ;------------------------------------------------------------
+                                    640 ;Allocation info for local variables in function 'main'
+                                    641 ;------------------------------------------------------------
+                                    642 ;previousCountLEDFlash     Allocated with name '_main_previousCountLEDFlash_10000_111'
+                                    643 ;previousCountUSBTransfer  Allocated with name '_main_previousCountUSBTransfer_10000_111'
+                                    644 ;usbStatus                 Allocated to registers r7 
+                                    645 ;i                         Allocated to registers r6 
+                                    646 ;len                       Allocated to registers r7 
+                                    647 ;endp                      Allocated to registers r5 
+                                    648 ;usbLocation               Allocated to registers r6 r7 
+                                    649 ;------------------------------------------------------------
+                                    650 ;	src\main.c:24: void main(void) {
+                                    651 ;	-----------------------------------------
+                                    652 ;	 function main
+                                    653 ;	-----------------------------------------
+      000000                        654 _main:
+                           000007   655 	ar7 = 0x07
+                           000006   656 	ar6 = 0x06
+                           000005   657 	ar5 = 0x05
+                           000004   658 	ar4 = 0x04
+                           000003   659 	ar3 = 0x03
+                           000002   660 	ar2 = 0x02
+                           000001   661 	ar1 = 0x01
+                           000000   662 	ar0 = 0x00
+                                    663 ;	src\main.c:29: system_CfgFsys();
+      000000 12r00r00         [24]  664 	lcall	_system_CfgFsys
+                                    665 ;	src\main.c:31: P1_MOD_OC = P1_MOD_OC & ~(1 << LED_PIN);
+      000003 53 92 EF         [24]  666 	anl	_P1_MOD_OC,#0xef
+                                    667 ;	src\main.c:32: P1_DIR_PU = P1_DIR_PU |	(1 << LED_PIN);
+      000006 43 93 10         [24]  668 	orl	_P1_DIR_PU,#0x10
+                                    669 ;	src\main.c:34: P1_MOD_OC = P1_MOD_OC | (1 << ENABLE_IAP_PIN);
+      000009 43 92 01         [24]  670 	orl	_P1_MOD_OC,#0x01
+                                    671 ;	src\main.c:35: P1_DIR_PU = P1_DIR_PU |	(1 << ENABLE_IAP_PIN);
+      00000C 43 93 01         [24]  672 	orl	_P1_DIR_PU,#0x01
+                                    673 ;	src\main.c:37: tick_initialiseTimer0();
+      00000F 12r00r00         [24]  674 	lcall	_tick_initialiseTimer0
+                                    675 ;	src\main.c:38: i2c_initialise();
+      000012 12r00r00         [24]  676 	lcall	_i2c_initialise
+                                    677 ;	src\main.c:39: ssd1306_initialise();
+      000015 12r00r00         [24]  678 	lcall	_ssd1306_initialise
+                                    679 ;	src\main.c:40: ssd1306_clearScreen();
+      000018 12r00r00         [24]  680 	lcall	_ssd1306_clearScreen
+                                    681 ;	src\main.c:41: tick_enableTimer0Interrupt();   // enable timer0 interrupt
+      00001B 12r00r00         [24]  682 	lcall	_tick_enableTimer0Interrupt
+                                    683 ;	src\main.c:44: PIN_FUNC = PIN_FUNC | (bUSB_IO_EN);
+      00001E 43 C6 80         [24]  684 	orl	_PIN_FUNC,#0x80
+                                    685 ;	src\main.c:45: InitUSB_Host();
+      000021 12r00r00         [24]  686 	lcall	_InitUSB_Host
+                                    687 ;	src\main.c:46: memset(&ThisUsbDev, 0, sizeof(_RootHubDev));
+      000024 75*00 00         [24]  688 	mov	_memset_PARM_2,#0x00
+      000027 75*00 0D         [24]  689 	mov	_memset_PARM_3,#0x0d
+      00002A 75*01 00         [24]  690 	mov	(_memset_PARM_3 + 1),#0x00
+      00002D 90r00r00         [24]  691 	mov	dptr,#_ThisUsbDev
+      000030 75 F0 00         [24]  692 	mov	b, #0x00
+      000033 12r00r00         [24]  693 	lcall	_memset
+                                    694 ;	src\main.c:47: FoundNewDev = 0;
+                                    695 ;	assignBit
+      000036 C2*00            [12]  696 	clr	_FoundNewDev
+                                    697 ;	src\main.c:50: EA = 1;                         // global interrupt enable
+                                    698 ;	assignBit
+      000038 D2 AF            [12]  699 	setb	_EA
+                                    700 ;	src\main.c:51: tick_startTimer0();
+      00003A 12r00r00         [24]  701 	lcall	_tick_startTimer0
+                                    702 ;	src\main.c:53: ssd1306_setCursor(0, 0);
+      00003D 75*00 00         [24]  703 	mov	_ssd1306_setCursor_PARM_2,#0x00
+      000040 75 82 00         [24]  704 	mov	dpl, #0x00
+      000043 12r00r00         [24]  705 	lcall	_ssd1306_setCursor
+                                    706 ;	src\main.c:54: ssd1306_printString("MOUSE - QUAD RUNNING");
+      000046 90r00r00         [24]  707 	mov	dptr,#___str_0
+      000049 75 F0 80         [24]  708 	mov	b, #0x80
+      00004C 12r00r00         [24]  709 	lcall	_ssd1306_printString
+                                    710 ;	src\main.c:56: while (1) {
+      00004F                        711 00134$:
+                                    712 ;	src\main.c:58: if ((tick_get1msTimerCount() - previousCountLEDFlash) > LED_FLASH_RATE_MS) {
+      00004F 12r00r00         [24]  713 	lcall	_tick_get1msTimerCount
+      000052 AC 82            [24]  714 	mov	r4, dpl
+      000054 AD 83            [24]  715 	mov	r5, dph
+      000056 AE F0            [24]  716 	mov	r6, b
+      000058 FF               [12]  717 	mov	r7, a
+      000059 EC               [12]  718 	mov	a,r4
+      00005A C3               [12]  719 	clr	c
+      00005B 95*02            [12]  720 	subb	a,_main_previousCountLEDFlash_10000_111
+      00005D FC               [12]  721 	mov	r4,a
+      00005E ED               [12]  722 	mov	a,r5
+      00005F 95*03            [12]  723 	subb	a,(_main_previousCountLEDFlash_10000_111 + 1)
+      000061 FD               [12]  724 	mov	r5,a
+      000062 EE               [12]  725 	mov	a,r6
+      000063 95*04            [12]  726 	subb	a,(_main_previousCountLEDFlash_10000_111 + 2)
+      000065 FE               [12]  727 	mov	r6,a
+      000066 EF               [12]  728 	mov	a,r7
+      000067 95*05            [12]  729 	subb	a,(_main_previousCountLEDFlash_10000_111 + 3)
+      000069 FF               [12]  730 	mov	r7,a
+      00006A C3               [12]  731 	clr	c
+      00006B 74 2C            [12]  732 	mov	a,#0x2c
+      00006D 9C               [12]  733 	subb	a,r4
+      00006E 74 01            [12]  734 	mov	a,#0x01
+      000070 9D               [12]  735 	subb	a,r5
+      000071 E4               [12]  736 	clr	a
+      000072 9E               [12]  737 	subb	a,r6
+      000073 E4               [12]  738 	clr	a
+      000074 9F               [12]  739 	subb	a,r7
+      000075 50 18            [24]  740 	jnc	00102$
+                                    741 ;	src\main.c:59: previousCountLEDFlash += LED_FLASH_RATE_MS;
+      000077 74 2C            [12]  742 	mov	a,#0x2c
+      000079 25*02            [12]  743 	add	a, _main_previousCountLEDFlash_10000_111
+      00007B F5*02            [12]  744 	mov	_main_previousCountLEDFlash_10000_111,a
+      00007D 74 01            [12]  745 	mov	a,#0x01
+      00007F 35*03            [12]  746 	addc	a, (_main_previousCountLEDFlash_10000_111 + 1)
+      000081 F5*03            [12]  747 	mov	(_main_previousCountLEDFlash_10000_111 + 1),a
+      000083 E4               [12]  748 	clr	a
+      000084 35*04            [12]  749 	addc	a, (_main_previousCountLEDFlash_10000_111 + 2)
+      000086 F5*04            [12]  750 	mov	(_main_previousCountLEDFlash_10000_111 + 2),a
+      000088 E4               [12]  751 	clr	a
+      000089 35*05            [12]  752 	addc	a, (_main_previousCountLEDFlash_10000_111 + 3)
+      00008B F5*05            [12]  753 	mov	(_main_previousCountLEDFlash_10000_111 + 3),a
+                                    754 ;	src\main.c:61: LED = !LED;
+      00008D B2 94            [12]  755 	cpl	_LED
+      00008F                        756 00102$:
+                                    757 ;	src\main.c:64: if (UIF_DETECT) {
+                                    758 ;	src\main.c:65: UIF_DETECT = 0;
+                                    759 ;	assignBit
+      00008F 10 D8 02         [24]  760 	jbc	_UIF_DETECT,00280$
+      000092 80 5B            [24]  761 	sjmp	00108$
+      000094                        762 00280$:
+                                    763 ;	src\main.c:66: usbStatus = AnalyzeRootHub();
+      000094 12r00r00         [24]  764 	lcall	_AnalyzeRootHub
+      000097 AF 82            [24]  765 	mov	r7, dpl
+                                    766 ;	src\main.c:67: if (ERR_USB_CONNECT == usbStatus) {
+      000099 BF 15 18         [24]  767 	cjne	r7,#0x15,00104$
+                                    768 ;	src\main.c:68: FoundNewDev = 1;
+                                    769 ;	assignBit
+      00009C D2*00            [12]  770 	setb	_FoundNewDev
+                                    771 ;	src\main.c:70: ssd1306_setCursor(0, 1);
+      00009E 75*00 01         [24]  772 	mov	_ssd1306_setCursor_PARM_2,#0x01
+      0000A1 75 82 00         [24]  773 	mov	dpl, #0x00
+      0000A4 C0 07            [24]  774 	push	ar7
+      0000A6 12r00r00         [24]  775 	lcall	_ssd1306_setCursor
+                                    776 ;	src\main.c:71: ssd1306_printString("CONNECTED USB DEVICE");
+      0000A9 90r00r15         [24]  777 	mov	dptr,#___str_1
+      0000AC 75 F0 80         [24]  778 	mov	b, #0x80
+      0000AF 12r00r00         [24]  779 	lcall	_ssd1306_printString
+      0000B2 D0 07            [24]  780 	pop	ar7
+      0000B4                        781 00104$:
+                                    782 ;	src\main.c:74: if (ERR_USB_DISCON == usbStatus) {
+      0000B4 BF 16 38         [24]  783 	cjne	r7,#0x16,00108$
+                                    784 ;	src\main.c:75: FoundNewDev = 0;
+                                    785 ;	assignBit
+      0000B7 C2*00            [12]  786 	clr	_FoundNewDev
+                                    787 ;	src\main.c:77: ssd1306_setCursor(0, 1);
+      0000B9 75*00 01         [24]  788 	mov	_ssd1306_setCursor_PARM_2,#0x01
+      0000BC 75 82 00         [24]  789 	mov	dpl, #0x00
+      0000BF 12r00r00         [24]  790 	lcall	_ssd1306_setCursor
+                                    791 ;	src\main.c:78: ssd1306_printString("REMOVED USB DEVICE  ");
+      0000C2 90r00r2A         [24]  792 	mov	dptr,#___str_2
+      0000C5 75 F0 80         [24]  793 	mov	b, #0x80
+      0000C8 12r00r00         [24]  794 	lcall	_ssd1306_printString
+                                    795 ;	src\main.c:79: ssd1306_setCursor(0, 2);
+      0000CB 75*00 02         [24]  796 	mov	_ssd1306_setCursor_PARM_2,#0x02
+      0000CE 75 82 00         [24]  797 	mov	dpl, #0x00
+      0000D1 12r00r00         [24]  798 	lcall	_ssd1306_setCursor
+                                    799 ;	src\main.c:80: ssd1306_printString("                    ");
+      0000D4 90r00r3F         [24]  800 	mov	dptr,#___str_3
+      0000D7 75 F0 80         [24]  801 	mov	b, #0x80
+      0000DA 12r00r00         [24]  802 	lcall	_ssd1306_printString
+                                    803 ;	src\main.c:81: ssd1306_setCursor(0, 3);
+      0000DD 75*00 03         [24]  804 	mov	_ssd1306_setCursor_PARM_2,#0x03
+      0000E0 75 82 00         [24]  805 	mov	dpl, #0x00
+      0000E3 12r00r00         [24]  806 	lcall	_ssd1306_setCursor
+                                    807 ;	src\main.c:82: ssd1306_printString("                    ");
+      0000E6 90r00r3F         [24]  808 	mov	dptr,#___str_3
+      0000E9 75 F0 80         [24]  809 	mov	b, #0x80
+      0000EC 12r00r00         [24]  810 	lcall	_ssd1306_printString
+      0000EF                        811 00108$:
+                                    812 ;	src\main.c:86: if (FoundNewDev) {
+                                    813 ;	src\main.c:87: FoundNewDev = 0;
+                                    814 ;	assignBit
+      0000EF 10*00 02         [24]  815 	jbc	_FoundNewDev,00285$
+      0000F2 80 23            [24]  816 	sjmp	00112$
+      0000F4                        817 00285$:
+                                    818 ;	src\main.c:89: usbStatus = EnumAllRootDevice();
+      0000F4 12r00r00         [24]  819 	lcall	_EnumAllRootDevice
+                                    820 ;	src\main.c:90: if (ERR_SUCCESS != usbStatus) {
+      0000F7 E5 82            [12]  821 	mov	a,dpl
+      0000F9 FF               [12]  822 	mov	r7,a
+      0000FA 60 1B            [24]  823 	jz	00112$
+                                    824 ;	src\main.c:91: ssd1306_setCursor(0, 2);
+      0000FC 75*00 02         [24]  825 	mov	_ssd1306_setCursor_PARM_2,#0x02
+      0000FF 75 82 00         [24]  826 	mov	dpl, #0x00
+      000102 C0 07            [24]  827 	push	ar7
+      000104 12r00r00         [24]  828 	lcall	_ssd1306_setCursor
+                                    829 ;	src\main.c:92: ssd1306_printString("ENUMERATION ERROR ");
+      000107 90r00r54         [24]  830 	mov	dptr,#___str_4
+      00010A 75 F0 80         [24]  831 	mov	b, #0x80
+      00010D 12r00r00         [24]  832 	lcall	_ssd1306_printString
+      000110 D0 07            [24]  833 	pop	ar7
+                                    834 ;	src\main.c:93: ssd1306_printHexByte(usbStatus);
+      000112 8F 82            [24]  835 	mov	dpl, r7
+      000114 12r00r00         [24]  836 	lcall	_ssd1306_printHexByte
+      000117                        837 00112$:
+                                    838 ;	src\main.c:97: if ((tick_get1msTimerCount() - previousCountUSBTransfer) > USB_TRANSFER_RATE_MS) {
+      000117 12r00r00         [24]  839 	lcall	_tick_get1msTimerCount
+      00011A AC 82            [24]  840 	mov	r4, dpl
+      00011C AD 83            [24]  841 	mov	r5, dph
+      00011E AE F0            [24]  842 	mov	r6, b
+      000120 FF               [12]  843 	mov	r7, a
+      000121 EC               [12]  844 	mov	a,r4
+      000122 C3               [12]  845 	clr	c
+      000123 95*06            [12]  846 	subb	a,_main_previousCountUSBTransfer_10000_111
+      000125 FC               [12]  847 	mov	r4,a
+      000126 ED               [12]  848 	mov	a,r5
+      000127 95*07            [12]  849 	subb	a,(_main_previousCountUSBTransfer_10000_111 + 1)
+      000129 FD               [12]  850 	mov	r5,a
+      00012A EE               [12]  851 	mov	a,r6
+      00012B 95*08            [12]  852 	subb	a,(_main_previousCountUSBTransfer_10000_111 + 2)
+      00012D FE               [12]  853 	mov	r6,a
+      00012E EF               [12]  854 	mov	a,r7
+      00012F 95*09            [12]  855 	subb	a,(_main_previousCountUSBTransfer_10000_111 + 3)
+      000131 FF               [12]  856 	mov	r7,a
+      000132 C3               [12]  857 	clr	c
+      000133 74 08            [12]  858 	mov	a,#0x08
+      000135 9C               [12]  859 	subb	a,r4
+      000136 E4               [12]  860 	clr	a
+      000137 9D               [12]  861 	subb	a,r5
+      000138 E4               [12]  862 	clr	a
+      000139 9E               [12]  863 	subb	a,r6
+      00013A E4               [12]  864 	clr	a
+      00013B 9F               [12]  865 	subb	a,r7
+      00013C 40 03            [24]  866 	jc	00287$
+      00013E 02r02r9A         [24]  867 	ljmp	00130$
+      000141                        868 00287$:
+                                    869 ;	src\main.c:98: previousCountUSBTransfer += USB_TRANSFER_RATE_MS;
+      000141 74 08            [12]  870 	mov	a,#0x08
+      000143 25*06            [12]  871 	add	a, _main_previousCountUSBTransfer_10000_111
+      000145 F5*06            [12]  872 	mov	_main_previousCountUSBTransfer_10000_111,a
+      000147 E4               [12]  873 	clr	a
+      000148 35*07            [12]  874 	addc	a, (_main_previousCountUSBTransfer_10000_111 + 1)
+      00014A F5*07            [12]  875 	mov	(_main_previousCountUSBTransfer_10000_111 + 1),a
+      00014C E4               [12]  876 	clr	a
+      00014D 35*08            [12]  877 	addc	a, (_main_previousCountUSBTransfer_10000_111 + 2)
+      00014F F5*08            [12]  878 	mov	(_main_previousCountUSBTransfer_10000_111 + 2),a
+      000151 E4               [12]  879 	clr	a
+      000152 35*09            [12]  880 	addc	a, (_main_previousCountUSBTransfer_10000_111 + 3)
+      000154 F5*09            [12]  881 	mov	(_main_previousCountUSBTransfer_10000_111 + 3),a
+                                    882 ;	src\main.c:100: usbLocation = SearchTypeDevice(DEV_TYPE_MOUSE);
+      000156 75 82 33         [24]  883 	mov	dpl, #0x33
+      000159 12r00r00         [24]  884 	lcall	_SearchTypeDevice
+      00015C AE 82            [24]  885 	mov	r6, dpl
+      00015E AF 83            [24]  886 	mov	r7, dph
+                                    887 ;	src\main.c:102: if(usbLocation != 0xFFFF) {                                   // found a mouse (how to deal with two mice?)
+      000160 8E 04            [24]  888 	mov	ar4,r6
+      000162 8F 05            [24]  889 	mov	ar5,r7
+      000164 BC FF 06         [24]  890 	cjne	r4,#0xff,00288$
+      000167 BD FF 03         [24]  891 	cjne	r5,#0xff,00288$
+      00016A 02r02r9A         [24]  892 	ljmp	00130$
+      00016D                        893 00288$:
+                                    894 ;	src\main.c:103: ssd1306_setCursor(0, 2);
+      00016D 75*00 02         [24]  895 	mov	_ssd1306_setCursor_PARM_2,#0x02
+      000170 75 82 00         [24]  896 	mov	dpl, #0x00
+      000173 C0 07            [24]  897 	push	ar7
+      000175 C0 06            [24]  898 	push	ar6
+      000177 12r00r00         [24]  899 	lcall	_ssd1306_setCursor
+                                    900 ;	src\main.c:104: ssd1306_printString("ENUMERATION LOC ");
+      00017A 90r00r67         [24]  901 	mov	dptr,#___str_5
+      00017D 75 F0 80         [24]  902 	mov	b, #0x80
+      000180 12r00r00         [24]  903 	lcall	_ssd1306_printString
+      000183 D0 06            [24]  904 	pop	ar6
+      000185 D0 07            [24]  905 	pop	ar7
+                                    906 ;	src\main.c:105: ssd1306_printHexWord(usbLocation);
+      000187 8E 82            [24]  907 	mov	dpl, r6
+      000189 8F 83            [24]  908 	mov	dph, r7
+      00018B C0 07            [24]  909 	push	ar7
+      00018D C0 06            [24]  910 	push	ar6
+      00018F 12r00r00         [24]  911 	lcall	_ssd1306_printHexWord
+                                    912 ;	src\main.c:107: ssd1306_setCursor(0, 3);
+      000192 75*00 03         [24]  913 	mov	_ssd1306_setCursor_PARM_2,#0x03
+      000195 75 82 00         [24]  914 	mov	dpl, #0x00
+      000198 12r00r00         [24]  915 	lcall	_ssd1306_setCursor
+                                    916 ;	src\main.c:108: SelectHubPort();                                 // select to operate designated ROOT-HUB port, set current USB speed and USB address of operated device
+      00019B 12r00r00         [24]  917 	lcall	_SelectHubPort
+      00019E D0 06            [24]  918 	pop	ar6
+      0001A0 D0 07            [24]  919 	pop	ar7
+                                    920 ;	src\main.c:109: usbLocation = usbLocation >> 8;                                 // CH554 has only one USB, only the lower eight bits are required
+      0001A2 8F 06            [24]  921 	mov	ar6,r7
+      0001A4 7F 00            [12]  922 	mov	r7,#0x00
+                                    923 ;	src\main.c:110: endp = usbLocation ? DevOnHubPort[usbLocation-1].GpVar[0] : ThisUsbDev.GpVar[0];  // address of interrupt endpoint, bit 7 is used for synchronization flag bit
+      0001A6 EE               [12]  924 	mov	a,r6
+      0001A7 4F               [12]  925 	orl	a,r7
+      0001A8 60 33            [24]  926 	jz	00141$
+      0001AA 8E 05            [24]  927 	mov	ar5,r6
+      0001AC 1D               [12]  928 	dec	r5
+      0001AD C2 D5            [12]  929 	clr	F0
+      0001AF 75 F0 0C         [24]  930 	mov	b,#0x0c
+      0001B2 ED               [12]  931 	mov	a,r5
+      0001B3 30 E7 04         [24]  932 	jnb	acc.7,00290$
+      0001B6 B2 D5            [12]  933 	cpl	F0
+      0001B8 F4               [12]  934 	cpl	a
+      0001B9 04               [12]  935 	inc	a
+      0001BA                        936 00290$:
+      0001BA A4               [48]  937 	mul	ab
+      0001BB 30 D5 0A         [24]  938 	jnb	F0,00291$
+      0001BE F4               [12]  939 	cpl	a
+      0001BF 24 01            [12]  940 	add	a,#0x01
+      0001C1 C5 F0            [12]  941 	xch	a,b
+      0001C3 F4               [12]  942 	cpl	a
+      0001C4 34 00            [12]  943 	addc	a,#0x00
+      0001C6 C5 F0            [12]  944 	xch	a,b
+      0001C8                        945 00291$:
+      0001C8 24r00            [12]  946 	add	a, #_DevOnHubPort
+      0001CA FC               [12]  947 	mov	r4,a
+      0001CB 74s00            [12]  948 	mov	a,#(_DevOnHubPort >> 8)
+      0001CD 35 F0            [12]  949 	addc	a, b
+      0001CF FD               [12]  950 	mov	r5,a
+      0001D0 74 08            [12]  951 	mov	a,#0x08
+      0001D2 2C               [12]  952 	add	a, r4
+      0001D3 F5 82            [12]  953 	mov	dpl,a
+      0001D5 E4               [12]  954 	clr	a
+      0001D6 3D               [12]  955 	addc	a, r5
+      0001D7 F5 83            [12]  956 	mov	dph,a
+      0001D9 E0               [24]  957 	movx	a,@dptr
+      0001DA FD               [12]  958 	mov	r5,a
+      0001DB 80 05            [24]  959 	sjmp	00142$
+      0001DD                        960 00141$:
+      0001DD 90r00r08         [24]  961 	mov	dptr,#(_ThisUsbDev + 0x0008)
+      0001E0 E0               [24]  962 	movx	a,@dptr
+      0001E1 FD               [12]  963 	mov	r5,a
+      0001E2                        964 00142$:
+                                    965 ;	src\main.c:112: if(endp & USB_ENDP_ADDR_MASK) {                     // endpoint valid
+      0001E2 ED               [12]  966 	mov	a,r5
+      0001E3 54 0F            [12]  967 	anl	a,#0x0f
+      0001E5 70 03            [24]  968 	jnz	00292$
+      0001E7 02r02r8B         [24]  969 	ljmp	00125$
+      0001EA                        970 00292$:
+                                    971 ;	src\main.c:113: usbStatus = USBHostTransact(USB_PID_IN << 4 | endp & 0x7F, endp & 0x80 ? bUH_R_TOG | bUH_T_TOG : 0, 0); // CH554 transmit transaction, get data, NAK does not retry
+      0001EA 74 7F            [12]  972 	mov	a,#0x7f
+      0001EC 5D               [12]  973 	anl	a,r5
+      0001ED 44 90            [12]  974 	orl	a,#0x90
+      0001EF FC               [12]  975 	mov	r4,a
+      0001F0 ED               [12]  976 	mov	a,r5
+      0001F1 30 E7 04         [24]  977 	jnb	acc.7,00143$
+      0001F4 7B C0            [12]  978 	mov	r3,#0xc0
+      0001F6 80 02            [24]  979 	sjmp	00144$
+      0001F8                        980 00143$:
+      0001F8 7B 00            [12]  981 	mov	r3,#0x00
+      0001FA                        982 00144$:
+      0001FA 8B*00            [24]  983 	mov	_USBHostTransact_PARM_2,r3
+      0001FC E4               [12]  984 	clr	a
+      0001FD F5*00            [12]  985 	mov	_USBHostTransact_PARM_3,a
+      0001FF F5*01            [12]  986 	mov	(_USBHostTransact_PARM_3 + 1),a
+      000201 8C 82            [24]  987 	mov	dpl, r4
+      000203 C0 07            [24]  988 	push	ar7
+      000205 C0 06            [24]  989 	push	ar6
+      000207 C0 05            [24]  990 	push	ar5
+      000209 12r00r00         [24]  991 	lcall	_USBHostTransact
+      00020C AC 82            [24]  992 	mov	r4, dpl
+      00020E D0 05            [24]  993 	pop	ar5
+      000210 D0 06            [24]  994 	pop	ar6
+      000212 D0 07            [24]  995 	pop	ar7
+                                    996 ;	src\main.c:114: if(usbStatus == ERR_SUCCESS) {
+      000214 EC               [12]  997 	mov	a,r4
+      000215 70 64            [24]  998 	jnz	00122$
+                                    999 ;	src\main.c:115: endp ^= 0x80;                                   // flip sync flag
+      000217 63 05 80         [24] 1000 	xrl	ar5,#0x80
+                                   1001 ;	src\main.c:117: if(usbLocation) {
+      00021A EE               [12] 1002 	mov	a,r6
+      00021B 4F               [12] 1003 	orl	a,r7
+      00021C 60 31            [24] 1004 	jz	00114$
+                                   1005 ;	src\main.c:118: DevOnHubPort[usbLocation-1].GpVar[0] = endp;    // save synchronization flag
+      00021E 1E               [12] 1006 	dec	r6
+      00021F C2 D5            [12] 1007 	clr	F0
+      000221 75 F0 0C         [24] 1008 	mov	b,#0x0c
+      000224 EE               [12] 1009 	mov	a,r6
+      000225 30 E7 04         [24] 1010 	jnb	acc.7,00296$
+      000228 B2 D5            [12] 1011 	cpl	F0
+      00022A F4               [12] 1012 	cpl	a
+      00022B 04               [12] 1013 	inc	a
+      00022C                       1014 00296$:
+      00022C A4               [48] 1015 	mul	ab
+      00022D 30 D5 0A         [24] 1016 	jnb	F0,00297$
+      000230 F4               [12] 1017 	cpl	a
+      000231 24 01            [12] 1018 	add	a,#0x01
+      000233 C5 F0            [12] 1019 	xch	a,b
+      000235 F4               [12] 1020 	cpl	a
+      000236 34 00            [12] 1021 	addc	a,#0x00
+      000238 C5 F0            [12] 1022 	xch	a,b
+      00023A                       1023 00297$:
+      00023A 24r00            [12] 1024 	add	a, #_DevOnHubPort
+      00023C FE               [12] 1025 	mov	r6,a
+      00023D 74s00            [12] 1026 	mov	a,#(_DevOnHubPort >> 8)
+      00023F 35 F0            [12] 1027 	addc	a, b
+      000241 FF               [12] 1028 	mov	r7,a
+      000242 74 08            [12] 1029 	mov	a,#0x08
+      000244 2E               [12] 1030 	add	a, r6
+      000245 F5 82            [12] 1031 	mov	dpl,a
+      000247 E4               [12] 1032 	clr	a
+      000248 3F               [12] 1033 	addc	a, r7
+      000249 F5 83            [12] 1034 	mov	dph,a
+      00024B ED               [12] 1035 	mov	a,r5
+      00024C F0               [24] 1036 	movx	@dptr,a
+      00024D 80 05            [24] 1037 	sjmp	00115$
+      00024F                       1038 00114$:
+                                   1039 ;	src\main.c:120: ThisUsbDev.GpVar[0] = endp;
+      00024F 90r00r08         [24] 1040 	mov	dptr,#(_ThisUsbDev + 0x0008)
+      000252 ED               [12] 1041 	mov	a,r5
+      000253 F0               [24] 1042 	movx	@dptr,a
+      000254                       1043 00115$:
+                                   1044 ;	src\main.c:123: len = USB_RX_LEN;                               // received data length
+                                   1045 ;	src\main.c:124: if(len) {
+      000254 E5 DB            [12] 1046 	mov	a,_USB_RX_LEN
+      000256 FF               [12] 1047 	mov	r7,a
+      000257 60 3B            [24] 1048 	jz	00126$
+                                   1049 ;	src\main.c:125: for(i=0; i<len; i++) {
+      000259 7E 00            [12] 1050 	mov	r6,#0x00
+      00025B                       1051 00137$:
+      00025B C3               [12] 1052 	clr	c
+      00025C EE               [12] 1053 	mov	a,r6
+      00025D 9F               [12] 1054 	subb	a,r7
+      00025E 50 34            [24] 1055 	jnc	00126$
+                                   1056 ;	src\main.c:126: ssd1306_printHexWord((uint16_t)(RxBuffer[i]));
+      000260 8E 82            [24] 1057 	mov	dpl,r6
+      000262 75 83s00         [24] 1058 	mov	dph,#(_RxBuffer >> 8)
+      000265 E0               [24] 1059 	movx	a,@dptr
+      000266 FD               [12] 1060 	mov	r5,a
+      000267 7B 00            [12] 1061 	mov	r3,#0x00
+      000269 8D 82            [24] 1062 	mov	dpl, r5
+      00026B 8B 83            [24] 1063 	mov	dph, r3
+      00026D C0 07            [24] 1064 	push	ar7
+      00026F C0 06            [24] 1065 	push	ar6
+      000271 12r00r00         [24] 1066 	lcall	_ssd1306_printHexWord
+      000274 D0 06            [24] 1067 	pop	ar6
+      000276 D0 07            [24] 1068 	pop	ar7
+                                   1069 ;	src\main.c:125: for(i=0; i<len; i++) {
+      000278 0E               [12] 1070 	inc	r6
+      000279 80 E0            [24] 1071 	sjmp	00137$
+      00027B                       1072 00122$:
+                                   1073 ;	src\main.c:129: } else if (usbStatus != (USB_PID_NAK | ERR_USB_TRANSFER)) {
+      00027B BC 2A 02         [24] 1074 	cjne	r4,#0x2a,00300$
+      00027E 80 14            [24] 1075 	sjmp	00126$
+      000280                       1076 00300$:
+                                   1077 ;	src\main.c:130: ssd1306_printString("MOUSE ERROR         ");
+      000280 90r00r78         [24] 1078 	mov	dptr,#___str_6
+      000283 75 F0 80         [24] 1079 	mov	b, #0x80
+      000286 12r00r00         [24] 1080 	lcall	_ssd1306_printString
+      000289 80 09            [24] 1081 	sjmp	00126$
+      00028B                       1082 00125$:
+                                   1083 ;	src\main.c:133: ssd1306_printString("NO INT END POINT    ");
+      00028B 90r00r8D         [24] 1084 	mov	dptr,#___str_7
+      00028E 75 F0 80         [24] 1085 	mov	b, #0x80
+      000291 12r00r00         [24] 1086 	lcall	_ssd1306_printString
+      000294                       1087 00126$:
+                                   1088 ;	src\main.c:136: SetUsbSpeed(1);                                     // default is full speed
+      000294 75 82 01         [24] 1089 	mov	dpl, #0x01
+      000297 12r00r00         [24] 1090 	lcall	_SetUsbSpeed
+      00029A                       1091 00130$:
+                                   1092 ;	src\main.c:140: if (EnableIAP == 0) {
+      00029A 30 90 03         [24] 1093 	jnb	_EnableIAP,00301$
+      00029D 02r00r4F         [24] 1094 	ljmp	00134$
+      0002A0                       1095 00301$:
+                                   1096 ;	src\main.c:141: ssd1306_clearScreen();
+      0002A0 12r00r00         [24] 1097 	lcall	_ssd1306_clearScreen
+                                   1098 ;	src\main.c:142: ssd1306_setCursor(0, 0);
+      0002A3 75*00 00         [24] 1099 	mov	_ssd1306_setCursor_PARM_2,#0x00
+      0002A6 75 82 00         [24] 1100 	mov	dpl, #0x00
+      0002A9 12r00r00         [24] 1101 	lcall	_ssd1306_setCursor
+                                   1102 ;	src\main.c:143: ssd1306_printString("---- BOOTLOADER ----");
+      0002AC 90r00rA2         [24] 1103 	mov	dptr,#___str_8
+      0002AF 75 F0 80         [24] 1104 	mov	b, #0x80
+      0002B2 12r00r00         [24] 1105 	lcall	_ssd1306_printString
+                                   1106 ;	src\main.c:144: bootloader();
+      0002B5 85*00 82         [24] 1107 	mov	dpl,_bootloader
+      0002B8 85*01 83         [24] 1108 	mov	dph,(_bootloader + 1)
+      0002BB 12r00r00         [24] 1109 	lcall	__sdcc_call_dptr
+                                   1110 ;	src\main.c:147: }
+      0002BE 02r00r4F         [24] 1111 	ljmp	00134$
+                                   1112 	.area CSEG    (CODE)
+                                   1113 	.area CONST   (CODE)
+                                   1114 	.area CONST   (CODE)
+      000000                       1115 ___str_0:
+      000000 4D 4F 55 53 45 20 2D  1116 	.ascii "MOUSE - QUAD RUNNING"
+             20 51 55 41 44 20 52
+             55 4E 4E 49 4E 47
+      000014 00                    1117 	.db 0x00
+                                   1118 	.area CSEG    (CODE)
+                                   1119 	.area CONST   (CODE)
+      000015                       1120 ___str_1:
+      000015 43 4F 4E 4E 45 43 54  1121 	.ascii "CONNECTED USB DEVICE"
+             45 44 20 55 53 42 20
+             44 45 56 49 43 45
+      000029 00                    1122 	.db 0x00
+                                   1123 	.area CSEG    (CODE)
+                                   1124 	.area CONST   (CODE)
+      00002A                       1125 ___str_2:
+      00002A 52 45 4D 4F 56 45 44  1126 	.ascii "REMOVED USB DEVICE  "
+             20 55 53 42 20 44 45
+             56 49 43 45 20 20
+      00003E 00                    1127 	.db 0x00
+                                   1128 	.area CSEG    (CODE)
+                                   1129 	.area CONST   (CODE)
+      00003F                       1130 ___str_3:
+      00003F 20 20 20 20 20 20 20  1131 	.ascii "                    "
+             20 20 20 20 20 20 20
+             20 20 20 20 20 20
+      000053 00                    1132 	.db 0x00
+                                   1133 	.area CSEG    (CODE)
+                                   1134 	.area CONST   (CODE)
+      000054                       1135 ___str_4:
+      000054 45 4E 55 4D 45 52 41  1136 	.ascii "ENUMERATION ERROR "
+             54 49 4F 4E 20 45 52
+             52 4F 52 20
+      000066 00                    1137 	.db 0x00
+                                   1138 	.area CSEG    (CODE)
+                                   1139 	.area CONST   (CODE)
+      000067                       1140 ___str_5:
+      000067 45 4E 55 4D 45 52 41  1141 	.ascii "ENUMERATION LOC "
+             54 49 4F 4E 20 4C 4F
+             43 20
+      000077 00                    1142 	.db 0x00
+                                   1143 	.area CSEG    (CODE)
+                                   1144 	.area CONST   (CODE)
+      000078                       1145 ___str_6:
+      000078 4D 4F 55 53 45 20 45  1146 	.ascii "MOUSE ERROR         "
+             52 52 4F 52 20 20 20
+             20 20 20 20 20 20
+      00008C 00                    1147 	.db 0x00
+                                   1148 	.area CSEG    (CODE)
+                                   1149 	.area CONST   (CODE)
+      00008D                       1150 ___str_7:
+      00008D 4E 4F 20 49 4E 54 20  1151 	.ascii "NO INT END POINT    "
+             45 4E 44 20 50 4F 49
+             4E 54 20 20 20 20
+      0000A1 00                    1152 	.db 0x00
+                                   1153 	.area CSEG    (CODE)
+                                   1154 	.area CONST   (CODE)
+      0000A2                       1155 ___str_8:
+      0000A2 2D 2D 2D 2D 20 42 4F  1156 	.ascii "---- BOOTLOADER ----"
+             4F 54 4C 4F 41 44 45
+             52 20 2D 2D 2D 2D
+      0000B6 00                    1157 	.db 0x00
+                                   1158 	.area CSEG    (CODE)
+                                   1159 	.area XINIT   (CODE)
+                                   1160 	.area CABS    (ABS,CODE)

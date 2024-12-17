@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "stdint.h": "c",
+        "ch554.h": "c",
+        "compiler.h": "c",
+        "8051.h": "c",
+        "debug.h": "c",
+        "i2c.h": "c",
+        "i2c_cfg.h": "c",
+        "ssd1306.h": "c",
+        "string.h": "c",
+        "usbhost.h": "c",
+        "ch554_usb.h": "c",
+        "system.h": "c",
+        "tick.h": "c",
+        "bootloader.h": "c",
+        "stdio.h": "c"
+    }
+}
