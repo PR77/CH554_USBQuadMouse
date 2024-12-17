@@ -7,5 +7,7 @@
 void system_CfgFsys(void);
 void mDelayuS(uint16_t n);
 void mDelaymS(uint16_t n);
+inline void system_WDTModeSelect(uint8_t mode);
+inline void system_WDTFeed(uint8_t timerTime);
 
 #endif // __CH554_SYSTEM_H__

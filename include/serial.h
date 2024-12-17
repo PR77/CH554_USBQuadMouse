@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "ch554.h"
+#include "serial_cfg.h"
 
 
 

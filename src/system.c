@@ -7,8 +7,7 @@
 * Function Name  : system_CfgFsys( )
 * Description    : CH554 clock selection and configuration function.
 *******************************************************************************/
-void system_CfgFsys(void)
-{
+void system_CfgFsys(void)  {
     SAFE_MOD = 0x55;
     SAFE_MOD = 0xAA;
 
@@ -42,8 +41,7 @@ void system_CfgFsys(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void mDelayuS(uint16_t n) // Delay in uS
-{
+void mDelayuS(uint16_t n) {
 #ifdef FREQ_SYS
 #if FREQ_SYS <= 6000000
     n >>= 2;
@@ -55,9 +53,8 @@ void mDelayuS(uint16_t n) // Delay in uS
     n >>= 4;
 #endif
 #endif
-    while (n)
-    {               // total = 12~13 Fsys cycles, 1uS @Fsys=12MHz
-        ++SAFE_MOD; // 2 Fsys cycles, for higher Fsys, add operation here
+    while (n) {                     // total = 12~13 Fsys cycles, 1uS @Fsys=12MHz
+        ++SAFE_MOD;                 // 2 Fsys cycles, for higher Fsys, add operation here
 #ifdef FREQ_SYS
 #if FREQ_SYS >= 14000000
         ++SAFE_MOD;
@@ -101,10 +98,9 @@ void mDelayuS(uint16_t n) // Delay in uS
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void mDelaymS(uint16_t n) // Delay in mS
-{
-    while (n)
-    {
+void mDelaymS(uint16_t n) {
+
+    while (n) {
 #ifdef DELAY_MS_HW
         while ((TKEY_CTRL & bTKC_IF) == 0)
             ;
@@ -115,4 +111,41 @@ void mDelaymS(uint16_t n) // Delay in mS
 #endif
         --n;
     }
+}
+
+/*******************************************************************************
+* Function Name  : CH554WDTModeSelect(uint8_t mode)
+* Description    : CH554 watchdog mode selection
+* Input          : uint8_t mode
+                   0  timer
+                   1  watchDog
+* Output         : None
+* Return         : None
+*******************************************************************************/
+inline void system_WDTModeSelect(uint8_t mode) {
+    SAFE_MOD = 0x55;
+    SAFE_MOD = 0xAA;                // Enter Safe Mode
+
+    if (mode) {
+        GLOBAL_CFG |= bWDOG_EN;     // Start watchdog reset
+    } else {
+        GLOBAL_CFG &= ~bWDOG_EN;    // Start watchdog only as a timer
+    }
+    
+    SAFE_MOD = 0x00;                // Exit safe Mode
+    WDOG_COUNT = 0;                 // Watchdog assignment initial value
+}
+
+/*******************************************************************************
+* Function Name  : CH554WDTFeed(uint8_t tim)
+* Description    : CH554 watchdog timer time setting
+* Input          : uint8_t tim watchdog reset time setting
+
+                   00H(6MHz)=2.8s
+                   80H(6MHz)=1.4s
+* Output         : None
+* Return         : None
+*******************************************************************************/
+inline void system_WDTFeed(uint8_t timerTime) {
+    WDOG_COUNT = timerTime;         // Watchdog counter assignment
 }
