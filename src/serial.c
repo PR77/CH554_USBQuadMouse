@@ -12,6 +12,13 @@
 #include "ch554.h"
 #include "serial.h"
 
+// HEX encoding table
+static const uint8_t hexTable[]={
+    '0', '1', '2', '3',
+    '4', '5', '6', '7',
+    '8', '9', 'A', 'B',
+    'C', 'D', 'E', 'F'
+};
 
 void serial_UART1Interrupt(void) __interrupt(INT_NO_UART1) {
 	uint8_t receivedData = 0;
@@ -39,8 +46,10 @@ inline void serial_initialiseSerial1(uint32_t baudRate, uint8_t alternativePins,
 
     if (enableInterrupt) {
         IE_UART1 = 1;
+        GPIO_IE = GPIO_IE | bIE_RXD1_LO;
     } else {
-        IE_UART1 = 1;
+        IE_UART1 = 0;
+        GPIO_IE = GPIO_IE & ~bIE_RXD1_LO;
     }
 }
 
@@ -69,7 +78,24 @@ inline uint8_t serial_getByteSerial1(void) {
 inline void serial_sendByteSerial1(uint8_t character) {
     
     SBUF1 = character;
+    
     while (U1TI == 0);                  // wait for transmit to finish (TI == 1)
     U1TI = 0;
 }
 
+void serial_printString(char* string) {
+
+    while (*string) {                       // repeat until string terminator
+        SERIAL_PORT_PUTCHR(*string++);  // print character on OLED
+    }
+}
+
+void serial_printHexByte(uint8_t value) {
+    SERIAL_PORT_PUTCHR(hexTable[(value >> 4)]);
+    SERIAL_PORT_PUTCHR(hexTable[value & 0x0F]);
+}
+
+void serial_printHexWord(uint16_t value) {
+    serial_printHexByte(value >> 8);
+    serial_printHexByte(value & 0xFF);
+}

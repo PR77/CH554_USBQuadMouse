@@ -45,7 +45,7 @@
 // -----------------------------------------------------------------------------
 
 // OLED init settings
-const uint8_t OLED_INIT_CMD[] = {
+static const uint8_t OLED_INIT_CMD[] = {
     OLED_MULTIPLEX, ((PAGES * 8) - 1),  // set multiplex (HEIGHT-1): 31 for 128x32, 63 for 128x64
 #if defined(SCREEN_128x32)  
     OLED_MEMORYMODE, 0x00,          // set page memory addressing mode
@@ -58,7 +58,7 @@ const uint8_t OLED_INIT_CMD[] = {
 };
 
 // Standard ASCII 5x8 font (adapted from Neven Boyanov and Stephen Denne)
-const uint8_t OLED_FONT[] = {
+static const uint8_t OLED_FONT[] = {
     0x00, 0x00, 0x00, 0x00, 0x00,   //   0 
     0x00, 0x00, 0x2f, 0x00, 0x00,   // ! 1 
     0x00, 0x07, 0x00, 0x07, 0x00,   // " 2 
@@ -126,7 +126,7 @@ const uint8_t OLED_FONT[] = {
 };
 
 // HEX encoding table
-const uint8_t hexTable[]={
+static const uint8_t hexTable[]={
     '0', '1', '2', '3',
     '4', '5', '6', '7',
     '8', '9', 'A', 'B',

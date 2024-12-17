@@ -20,5 +20,8 @@ inline void serial_disableSerial1Interrupt(void);
 inline void serial_enableSerial1Interrupt(void);
 inline uint8_t serial_getByteSerial1(void);
 inline void serial_sendByteSerial1(uint8_t character);
+void serial_printString(char* string);
+void serial_printHexByte(uint8_t value);
+void serial_printHexWord(uint16_t value);
 
 #endif // __CH554_SERIAL_H__

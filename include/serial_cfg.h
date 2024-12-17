@@ -13,6 +13,12 @@
 #include <stdint.h>
 #include "ch554.h"
 
+#ifndef SERIAL_BAUD_RATE
+#define SERIAL_BAUD_RATE        38400
+#endif
 
+#ifndef SERIAL_PORT_PUTCHR
+#define SERIAL_PORT_PUTCHR(x)   serial_sendByteSerial1(x)
+#endif
 
 #endif // __CH554_SERIAL_CFG_H__

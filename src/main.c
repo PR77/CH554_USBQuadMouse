@@ -9,7 +9,7 @@
 #include "i2c.h"
 #include "ssd1306.h"
 #include "usbhost.h"
-#include "debug.h"
+#include "serial.h"
 #include "bootloader.h"
 
 #define LED_FLASH_RATE_MS               300
@@ -35,6 +35,7 @@ void main(void) {
     P1_DIR_PU = P1_DIR_PU |	(1 << ENABLE_IAP_PIN);
 
     tick_initialiseTimer0();
+    serial_initialiseSerial1(SERIAL_BAUD_RATE, 0, 0);
     i2c_initialise();
     ssd1306_initialise();
     ssd1306_clearScreen();
