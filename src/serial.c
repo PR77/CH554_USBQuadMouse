@@ -88,7 +88,7 @@ void serial_printString(char* string) {
         return;
     }
     
-    while (*string) {                       // repeat until string terminator
+    while (*string) {                   // repeat until string terminator
         SERIAL_PORT_PUTCHR(*string++);  // print character on OLED
     }
 }
