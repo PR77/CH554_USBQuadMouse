@@ -19,6 +19,8 @@
 #include "ch554.h"
 
 void system_CfgFsys(void);
+inline void system_enableGlobalInterupts(void);
+inline void system_disableGlobalInterupts(void);
 void mDelayuS(uint16_t n);
 void mDelaymS(uint16_t n);
 inline void system_WDTModeSelect(uint8_t mode);

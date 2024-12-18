@@ -48,6 +48,20 @@ void system_CfgFsys(void)  {
     SAFE_MOD = 0x00;
 }
 
+inline void system_enableGlobalInterupts(void) {
+
+    if (EA == 0) {
+        EA = 1;                     // only if already disabled, then enable global interrupts
+    }
+}
+
+inline void system_disableGlobalInterupts(void) {
+
+    if (EA == 1) {
+        EA = 0;                     // only if already enabled, then disable global interrupts
+    }
+}
+
 /*******************************************************************************
 * Function Name  : mDelayus(UNIT16 n)
 * Description    : us delay function

@@ -26,6 +26,7 @@ void main(void) {
     uint8_t usbStatus = ERR_USB_UNKNOWN, i = 0, len = 0, endp = 0;
     uint16_t usbLocation = 0;
 
+    system_disableGlobalInterupts();
     system_CfgFsys();
 
     P1_MOD_OC = P1_MOD_OC & ~(1 << LED_PIN);
@@ -35,11 +36,11 @@ void main(void) {
     P1_DIR_PU = P1_DIR_PU |	(1 << ENABLE_IAP_PIN);
 
     tick_initialiseTimer0();
+    tick_enableTimer0Interrupt();
     serial_initialiseSerial1(SERIAL_BAUD_RATE, 0, 0);
     i2c_initialise();
     ssd1306_initialise();
     ssd1306_clearScreen();
-    tick_enableTimer0Interrupt();   // enable timer0 interrupt
 
     /*CLEAN UP THIS*/
     PIN_FUNC = PIN_FUNC | (bUSB_IO_EN);
@@ -48,8 +49,8 @@ void main(void) {
     FoundNewDev = 0;
     /**/
 
-    EA = 1;                         // global interrupt enable
     tick_startTimer0();
+    system_enableGlobalInterupts();
 
     ssd1306_setCursor(0, 0);
     ssd1306_printString("MOUSE - QUAD RUNNING");

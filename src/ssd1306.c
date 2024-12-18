@@ -126,7 +126,7 @@ static const uint8_t OLED_FONT[] = {
 };
 
 // HEX encoding table
-static const uint8_t hexTable[]={
+static const uint8_t hexTable[] = {
     '0', '1', '2', '3',
     '4', '5', '6', '7',
     '8', '9', 'A', 'B',
@@ -169,6 +169,11 @@ void ssd1306_printCharacter(char character) {
 
 // OLED print a string from program memory
 void ssd1306_printString(char* string) {
+    
+    if (!string) {
+        return;
+    }
+
     i2c_startCommunication(OLED_ADDR);
     i2c_writeByte(OLED_DAT_MODE);
     while (*string) {                       // repeat until string terminator

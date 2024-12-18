@@ -13,7 +13,7 @@
 #include "serial.h"
 
 // HEX encoding table
-static const uint8_t hexTable[]={
+static const uint8_t hexTable[] = {
     '0', '1', '2', '3',
     '4', '5', '6', '7',
     '8', '9', 'A', 'B',
@@ -72,11 +72,10 @@ inline uint8_t serial_getByteSerial1(void) {
     while (U1RI == 0);                  // wait for receive interrupt flag (RI == 1)
     U1RI = 0;
 
-    return SBUF1;
+    return (SBUF1);
 }
 
 inline void serial_sendByteSerial1(uint8_t character) {
-    
     SBUF1 = character;
     
     while (U1TI == 0);                  // wait for transmit to finish (TI == 1)
@@ -85,6 +84,10 @@ inline void serial_sendByteSerial1(uint8_t character) {
 
 void serial_printString(char* string) {
 
+    if (!string) {
+        return;
+    }
+    
     while (*string) {                       // repeat until string terminator
         SERIAL_PORT_PUTCHR(*string++);  // print character on OLED
     }
