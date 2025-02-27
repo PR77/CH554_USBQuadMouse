@@ -7,12 +7,8 @@
 * Description   : CH554 Bootloader entry
 *******************************************************************************/
 
-#ifndef __CH554_BOOTLOADER_H__
-#define __CH554_BOOTLOADER_H__
-
 #include <stdint.h>
 #include "ch554.h"
+#include "bootloader.h"
 
-extern void (* __code bootloader)(void);
-
-#endif // __CH554_BOOTLOADER_H__
+void (* __code bootloader)(void) = BOOT_LOAD_ADDR;

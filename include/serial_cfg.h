@@ -17,8 +17,12 @@
 #define SERIAL_BAUD_RATE        38400
 #endif
 
-#ifndef SERIAL_PORT_PUTCHR
-#define SERIAL_PORT_PUTCHR(x)   serial_sendByteSerial1(x)
+#ifndef CONSOLE_PORT_PUTCHR
+#define CONSOLE_PORT_PUTCHR(x)  serial_sendByteSerial1(x)
+#endif
+
+#ifndef CONSOLE_PORT_GETCHR
+#define CONSOLE_PORT_GETCHR()   serial_getByteSerial1()
 #endif
 
 #endif // __CH554_SERIAL_CFG_H__

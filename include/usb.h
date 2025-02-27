@@ -2,12 +2,8 @@
 // USB constant and structure define
 // ===================================================================================
 
-#ifndef __CH554_USB_H__
-#define __CH554_USB_H__
-
+#pragma once
 #include <stdint.h>
-#include "ch554.h"
-#include "usbhost.h"
 
 // USB PID
 #ifndef USB_PID_SETUP
@@ -333,5 +329,3 @@ typedef struct _UDISK_BOC_CSW {             // status of BulkOnly USB-FlashDisk
     uint8_t mCSW_Status;                    // return: result status
 } UDISK_BOC_CSW, *PUDISK_BOC_CSW;
 typedef UDISK_BOC_CSW __xdata *PXUDISK_BOC_CSW;
-
-#endif // __CH554_USB_H__

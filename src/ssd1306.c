@@ -197,11 +197,13 @@ void ssd1306_printHexWord(uint16_t value) {
 
 // OLED set the cursor
 void ssd1306_setCursor(uint8_t xPosition, uint8_t yPosition) {
+    uint8_t xPositionCharacter = xPosition * (OLED_FONT_WIDTH + 1); // x postion based on character width
+
     i2c_startCommunication(OLED_ADDR);
     i2c_writeByte(OLED_CMD_MODE);
-    i2c_writeByte(OLED_PAGE | (yPosition & 0x07));          // set start page
-    i2c_writeByte(OLED_COLUMN_LOW | (xPosition & 0x0F));    // set low nibble of start column
-    i2c_writeByte(OLED_COLUMN_HIGH | (xPosition >> 4));     // set high nibble of start column
+    i2c_writeByte(OLED_PAGE | (yPosition & 0x07));                  // set start page
+    i2c_writeByte(OLED_COLUMN_LOW | (xPositionCharacter & 0x0F));   // set low nibble of start column
+    i2c_writeByte(OLED_COLUMN_HIGH | (xPositionCharacter >> 4));    // set high nibble of start column
     i2c_stopCommunication();
 }
 
