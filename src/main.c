@@ -70,7 +70,7 @@ void main(void) {
 
     ssd1306_setCursor(0, 0);
     ssd1306_printString("MOUSE <> QUAD RUNNING");
-    serial_printString("\x1b[2J\x1b[HMOUSE - QUAD RUNNING\n\r");
+    serial_printString("\x1b[2J\x1b[HMOUSE <> QUAD RUNNING\n\r");
     
     while (1) {
 

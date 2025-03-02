@@ -11,8 +11,11 @@
 #include <compiler.h>
 #include <string.h>
 #include "ch554.h"
+#include "serial.h"
 #include "quadrature.h"
 #include "quadrature_cfg.h"
+
+#define ENABLE_QUADRATURE_DEBUG
 
 SBIT(QUADRATURE_XA, QUADRATURE_PORT, QUADRATURE_XA_PIN);
 SBIT(QUADRATURE_XB, QUADRATURE_PORT, QUADRATURE_XB_PIN);
@@ -70,18 +73,21 @@ static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
 
     uint8_t currentSequenceIndex = 0, currentChannelIndex = 0;
 
+    // NULL pointer check
     if (!quadratureOutput) {
         return;
     }
 
     currentChannelIndex = quadratureOutput->channelIndex;
 
+    // Channel index check
     if (QUADRATURE_CHANNELS >= currentChannelIndex) {
         return;
     }
 
     currentSequenceIndex = quadratureOutput->sequenceIndex;
 
+    // Sequence index check
     if (currentSequenceIndex >= QUADRATURE_SEQUENCE_STEPS) {
         return;
     }
@@ -96,13 +102,27 @@ static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
         return;
     }
 
+    #ifdef ENABLE_QUADRATURE_DEBUG
+    {
+        serial_printString((QUADRATURE_XA == QUADRATURE_HIGH) ? "-" : "_");
+        serial_printString("\x1b[1B");
+        serial_printString("\x1b[1D");
+        serial_printString((QUADRATURE_XB == QUADRATURE_HIGH) ? "-" : "_");
+        serial_printString("\x1b[1A");
+    }
+    #endif // ENABLE_QUADRATURE_DEBUG
+
     if (quadratureOutputs->direction == QUADRATURE_FORWARD) {
-        if (currentSequenceIndex++ >= QUADRATURE_SEQUENCE_STEPS) {
+        if ((currentSequenceIndex + 1) >= QUADRATURE_SEQUENCE_STEPS) {
             currentSequenceIndex = 0;
+        } else {
+            currentSequenceIndex++;
         }
     } else if (quadratureOutputs->direction == QUADRATURE_BACKWARD) {
-        if (currentSequenceIndex-- == 0) {
+        if (currentSequenceIndex == 0) {
             currentSequenceIndex = (QUADRATURE_SEQUENCE_STEPS - 1);
+        } else {
+            currentSequenceIndex--;    
         }
     } else {
         return;
