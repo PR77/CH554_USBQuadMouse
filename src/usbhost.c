@@ -543,22 +543,6 @@ uint8_t HubClearPortFeature(uint8_t HubPortIndex, uint8_t FeatureSelt) {
 }
 
 // ===================================================================================
-// Printer class commands
-// Return ERR_USB_BUF_OVER: wrong descriptor length
-//        ERR_SUCCESS:      success
-// ===================================================================================
-uint8_t CtrlGetXPrinterReport1(void) {
-  uint8_t s;
-  uint16_t len;
-  CopySetupReqPkg(XPrinterReport);
-  s = HostCtrlTransfer(Com_Buffer, (uint8_t *)&len);  // execute control transfer
-  if(s != ERR_SUCCESS) return(s);
-  //if(len < ((XPrinterReport[7]<<8) | (XPrinterReport[6])))
-  //  return(ERR_USB_BUF_OVER);                       // wrong descriptor length
-  return(ERR_SUCCESS);
-}
-
-// ===================================================================================
 // Analyze the address of the HID interrupt endpoint from the descriptor, if the 
 // HubPortIndex is 0, save it to ROOTHUB, if it is a non-zero value, save it to 
 // the structure under the HUB.
@@ -644,6 +628,7 @@ uint8_t AnalyzeBulkEndp(__xdata uint8_t *buf, uint8_t HubPortIndex) {
 // ===================================================================================
 // Try to start AOA mode
 // ===================================================================================
+#ifdef AOA_SUPPORT_PACKAGE
 uint8_t TouchStartAOA(void) {
   uint8_t len,s,i,Num;
   uint16_t cp_len;
@@ -665,6 +650,7 @@ uint8_t TouchStartAOA(void) {
   if(s != ERR_SUCCESS) return(s);
   return ERR_SUCCESS;
 }
+#endif
 
 // ===================================================================================
 // Initialize the USB device of the specified ROOT-HUB port
@@ -672,7 +658,9 @@ uint8_t TouchStartAOA(void) {
 // ===================================================================================
 uint8_t InitRootDevice(void) {
   uint8_t t, i, s, cfg, dv_cls, if_cls, ifc;
+  #ifdef AOA_SUPPORT_PACKAGE
   uint8_t touchaoatm = 0;
+  #endif
   t = 0;
   #if DEBUG_ENABLE
   printf("Reset USB Port\n");
@@ -734,6 +722,7 @@ USBDevEnum:
         // Analyze the configuration descriptor, obtain endpoint data/endpoint address/endpoint size, etc., 
         // update variables endp_addr and endp_size, etc.
         if_cls = ((PXUSB_CFG_DESCR_LONG)Com_Buffer)->itf_descr.bInterfaceClass; // interface class code
+        
         // USB storage device, basically confirmed to be a U disk
         if(dv_cls == 0x00 && if_cls == USB_DEV_CLASS_STORAGE) {
           AnalyzeBulkEndp(Com_Buffer, 0);
@@ -751,36 +740,6 @@ USBDevEnum:
             #endif											
             SetUsbSpeed(1);                   // default is full speed
             return(ERR_SUCCESS);
-          }
-        }
-
-        // Printer device
-        else if(dv_cls == 0x00 && if_cls == USB_DEV_CLASS_PRINTER 
-          && ((PXUSB_CFG_DESCR_LONG)Com_Buffer) -> itf_descr.bInterfaceSubClass == 0x01) {
-          #if DEBUG_ENABLE										
-          printf("USB-Print OK\n");
-          #endif									
-          if((Com_Buffer[19] == 5) && (Com_Buffer[20]&&0x80))
-            ThisUsbDev.GpVar[0] = Com_Buffer[20];               // IN endpoint
-          else if((Com_Buffer[19] == 5) && ((Com_Buffer[20]&&0x80) == 0))
-            ThisUsbDev.GpVar[1] = Com_Buffer[20];               // OUT endpoint
-          if((Com_Buffer[26] == 5) && (Com_Buffer[20]&&0x80))
-            ThisUsbDev.GpVar[0] = Com_Buffer[27];               // IN endpoint
-          else if((Com_Buffer[26] == 5) && ((Com_Buffer[20]&&0x80) == 0))
-            ThisUsbDev.GpVar[1] = Com_Buffer[27];               // OUT endpoint
-          s = CtrlSetUsbConfig(cfg);                            // set USB device configuration
-          if(s == ERR_SUCCESS)  {
-            s = CtrlSetUsbIntercace(cfg);
-            s = CtrlGetXPrinterReport1();                       // printer class commands
-            if(s == ERR_SUCCESS) {
-              ThisUsbDev.DeviceStatus = ROOT_DEV_SUCCESS;
-              ThisUsbDev.DeviceType = USB_DEV_CLASS_PRINTER;
-              #if DEBUG_ENABLE														 
-              printf("USB-Print Ready\n");
-              #endif													 
-              SetUsbSpeed(1);                                   // default is full speed
-              return(ERR_SUCCESS);
-            }
           }
         }
 
@@ -920,6 +879,7 @@ USBDevEnum:
             #if DEBUG_ENABLE						
             printf("%02x %02x\n", (uint16_t)ThisUsbDev.DeviceVID, (uint16_t)ThisUsbDev.DevicePID);
             #endif
+#ifdef AOA_SUPPORT_PACKAGE
             if((ThisUsbDev.DeviceVID == 0x18D1) && (ThisUsbDev.DevicePID&0xff00) == 0x2D00) {   // AOA accessories
               #if DEBUG_ENABLE
               printf("AOA Mode\n");
@@ -938,13 +898,16 @@ USBDevEnum:
                   DLY_ms(500);        // some Android devices automatically disconnect and reconnect, so it is best to have a delay here
                   goto USBDevEnum;    // In fact, there is no need to jump here. The AOA protocol stipulates that the device will automatically reconnect to the bus.
                 }
+#endif
                 // Execute to this point, indicating that AOA may not be supported, or other devices
                 ThisUsbDev.DeviceType = dv_cls ? dv_cls : if_cls;
                 ThisUsbDev.DeviceStatus = ROOT_DEV_SUCCESS;
                 SetUsbSpeed(1);                                 // default is full speed
                 return(ERR_SUCCESS);                            // unknown device initialized successfully
-              }							
+#ifdef AOA_SUPPORT_PACKAGE
+              }						
             }
+#endif	
           }
         }
       }

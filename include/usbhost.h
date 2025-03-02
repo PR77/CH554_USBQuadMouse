@@ -49,15 +49,16 @@ extern __code uint8_t  SetupClrEndpStall[];     // clear endpoint STALL
 extern __code uint8_t  SetupGetHubDescr[];      // get HUB descriptor
 extern __code uint8_t  SetupSetHIDIdle[];
 extern __code uint8_t  SetupGetHIDDevReport[];  // get the HID device report descriptor
-extern __code uint8_t  XPrinterReport[];        // printer class commands
 #endif
 extern __xdata uint8_t  UsbDevEndp0Size;        // maximum packet size for endpoint 0 of a USB device
 
+#ifdef AOA_SUPPORT_PACKAGE
 extern __code uint8_t  GetProtocol[];           // AOA obtains the protocol version
 extern __code uint8_t  TouchAOAMode[];          // start accessory mode
 extern __code uint8_t  Sendlen[];               // AOA related array definition
 extern __code uint8_t  StringID[];              // string ID, string information related to mobile APP
 extern __code uint8_t  SetStringID[];           // apply index string command
+#endif
 
 #ifndef DISK_BASE_BUF_LEN
 typedef struct {
@@ -122,7 +123,6 @@ uint8_t CtrlGetHubDescr(void);                  // get the HUB descriptor and re
 uint8_t HubGetPortStatus(uint8_t HubPortIndex); // query the HUB port status and return it in TxBuffer
 uint8_t HubSetPortFeature(uint8_t HubPortIndex, uint8_t FeatureSelt);   // set HUB port characteristics
 uint8_t HubClearPortFeature(uint8_t HubPortIndex, uint8_t FeatureSelt); // clear HUB port characteristics
-uint8_t CtrlGetXPrinterReport1(void);           // printer class commands
 uint8_t AnalyzeHidIntEndp(__xdata uint8_t *buf, uint8_t HubPortIndex);  // analyze the address of the HID interrupt endpoint from the descriptor
 uint8_t AnalyzeBulkEndp(__xdata uint8_t *buf, uint8_t HubPortIndex);    // parse out bulk endpoints
 uint8_t TouchStartAOA(void);                    // try AOA boot
