@@ -34,6 +34,7 @@ void quadrature_initialise(void) {
     // TODO...
     // NOT PUSH PULL --- NEEDS TO BE WEAK PULLUP, BUT CHECK AGAINST SCHEMATICS!!!
 
+    #ifndef ENABLE_QUADRATURE_DEBUG
     QUADRATURE_MOD_OC = QUADRATURE_MOD_OC | (1 << QUADRATURE_XA_PIN);
     QUADRATURE_DIR_PU = QUADRATURE_DIR_PU | (1 << QUADRATURE_XA_PIN);
 
@@ -45,6 +46,7 @@ void quadrature_initialise(void) {
 
     QUADRATURE_MOD_OC = QUADRATURE_MOD_OC | (1 << QUADRATURE_YB_PIN);
     QUADRATURE_DIR_PU = QUADRATURE_DIR_PU | (1 << QUADRATURE_YB_PIN);
+    #endif // ENABLE_QUADRATURE_DEBUG
 
     memset(&quadratureOutputs, 0, (sizeof(quadratureOutput_s) * QUADRATURE_CHANNELS));
 
@@ -52,7 +54,22 @@ void quadrature_initialise(void) {
     quadratureOutputs[QUADRATURE_Y_CHANNEL].channelIndex = QUADRATURE_Y_CHANNEL;
 }
 
-void quadrature_update(uint8_t channelIndex, int8_t counts) {
+void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
+
+    uint8_t currentSequenceIndex = 0;
+
+    if (QUADRATURE_CHANNELS >= channelIndex) {
+        return;
+    }
+
+    // TODO...
+    // check direction change
+    // process counts
+
+    quadratureOutputs[channelIndex].sequenceCounts += counts;
+}
+
+void quadrature_update(uint8_t channelIndex) {
 
     uint8_t currentSequenceIndex = 0;
 
@@ -92,23 +109,23 @@ static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
         return;
     }
 
-    if (currentChannelIndex == QUADRATURE_X_CHANNEL) {
-        QUADRATURE_XA = QUADRATURE_SEQUENCE[currentChannelIndex][currentSequenceIndex];
-        QUADRATURE_XB = QUADRATURE_SEQUENCE[currentChannelIndex][currentSequenceIndex];
-    } else if (currentChannelIndex == QUADRATURE_Y_CHANNEL) {
-        QUADRATURE_YA = QUADRATURE_SEQUENCE[currentChannelIndex][currentSequenceIndex];
-        QUADRATURE_YB = QUADRATURE_SEQUENCE[currentChannelIndex][currentSequenceIndex];
-    } else {
-        return;
-    }
-
     #ifdef ENABLE_QUADRATURE_DEBUG
     {
-        serial_printString((QUADRATURE_XA == QUADRATURE_HIGH) ? "-" : "_");
+        serial_printString((QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex] == QUADRATURE_HIGH) ? "-" : "_");
         serial_printString("\x1b[1B");
         serial_printString("\x1b[1D");
-        serial_printString((QUADRATURE_XB == QUADRATURE_HIGH) ? "-" : "_");
+        serial_printString((QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex] == QUADRATURE_HIGH) ? "-" : "_");
         serial_printString("\x1b[1A");
+    }
+    #else
+    if (currentChannelIndex == QUADRATURE_X_CHANNEL) {
+        QUADRATURE_XA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
+        QUADRATURE_XB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
+    } else if (currentChannelIndex == QUADRATURE_Y_CHANNEL) {
+        QUADRATURE_YA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
+        QUADRATURE_YB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
+    } else {
+        return;
     }
     #endif // ENABLE_QUADRATURE_DEBUG
 

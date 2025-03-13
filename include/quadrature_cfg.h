@@ -17,6 +17,9 @@
 #define QUADRATURE_CHANNELS         2
 #endif
 
+#define QUADRATURE_CHANNELS_A_INDEX 0
+#define QUADRATURE_CHANNELS_B_INDEX 1
+
 #ifndef QUADRATURE_X_CHANNEL
 #define QUADRATURE_X_CHANNEL        0
 #endif

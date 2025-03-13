@@ -54,9 +54,7 @@ void main(void) {
 
     tick_initialiseTimer0();
     tick_enableTimer0Interrupt();
-    /*
     quadrature_initialise();
-    */
     heartbeat_initialise();
     serial_initialiseSerial1(SERIAL_BAUD_RATE, 0, 0);
     i2c_initialise();
