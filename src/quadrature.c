@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <compiler.h>
 #include <string.h>
+#include <stdlib.h>
 #include "ch554.h"
 #include "serial.h"
 #include "quadrature.h"
@@ -60,11 +61,26 @@ void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
         return;
     }
 
-    // TODO...
-    // check direction change
-    // process counts
+    if ((counts > 0) && (counts < INT8_MAX)) {
+        if (quadratureOutputs[channelIndex].direction == QUADRATURE_BACKWARD) {
+            quadratureOutputs[channelIndex].direction = QUADRATURE_FORWARD;
+            quadratureOutputs[channelIndex].directionChange = 1;
+        }
+    }
 
-    quadratureOutputs[channelIndex].sequenceCounts += counts;
+    if ((counts > INT8_MIN) && (counts < 0)) {
+        if (quadratureOutputs[channelIndex].direction == QUADRATURE_FORWARD) {
+            quadratureOutputs[channelIndex].direction = QUADRATURE_BACKWARD;
+            quadratureOutputs[channelIndex].directionChange = 1;
+        }
+    }
+
+    if (quadratureOutputs[channelIndex].directionChange == 1) {
+        quadratureOutputs[channelIndex].directionChange = 0;
+        return;    
+    }
+
+    quadratureOutputs[channelIndex].sequenceCounts += abs(counts);
 }
 
 void quadrature_update(uint8_t channelIndex) {

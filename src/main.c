@@ -71,8 +71,6 @@ void main(void) {
     ssd1306_printString("MOUSE <> QUAD RUNNING");
     serial_printString("\x1b[2J\x1b[HMOUSE <> QUAD RUNNING\n\r");
 
-    quadrature_updateCounts(QUADRATURE_X_CHANNEL, 10);
-    
     while (1) {
 
         if ((tick_get1msTimerCount() - previousCountLEDFlash) > LED_FLASH_RATE_MS) {
@@ -155,6 +153,7 @@ void main(void) {
                             ssd1306_setCursor(10, 3);
                             if ((uint8_t)(RxBuffer[0]) & 0x01) {
                                 ssd1306_printString("L");
+                                quadrature_updateCounts(QUADRATURE_X_CHANNEL, 10);
                             } else ssd1306_printString("-");
 
                             ssd1306_setCursor(11, 3);
@@ -165,6 +164,7 @@ void main(void) {
                             ssd1306_setCursor(12, 3);
                             if ((uint8_t)(RxBuffer[0]) & 0x02) {
                                 ssd1306_printString("R, ");
+                                quadrature_updateCounts(QUADRATURE_X_CHANNEL, -10);
                             } else ssd1306_printString("-, ");
 
                             ssd1306_printHexByte((uint8_t)(RxBuffer[1]));
