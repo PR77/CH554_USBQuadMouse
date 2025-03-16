@@ -31,8 +31,9 @@ typedef struct {
 } quadratureOutput_s;
 
 void quadrature_initialise(void);
+inline void quadrature_startEncoding(void);
+inline void quadrature_stopEncoding(void);
 void quadrature_updateCounts(uint8_t channelIndex, int8_t counts);
-void quadrature_update(uint8_t channelIndex);
 static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput);
 
 #endif // __CH554_QUADRATURE_H__

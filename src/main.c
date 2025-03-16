@@ -1,4 +1,11 @@
-// Blink an LED connected to pin 1.4 via timer and some other stuff
+/********************************** (C) COPYRIGHT *******************************
+* File Name     : MAIN.c
+* Author        : Paul Raspa (PR77)
+* License       : MIT
+* Version       : V1.0
+* Date          : 2024/12/17
+* Description   : CH554 USB <> QUADRATURE Encoder for Amiga
+*******************************************************************************/
 
 #include <stdint.h>
 #include <stdio.h>
@@ -16,10 +23,6 @@
 
 #define LED_FLASH_RATE_MS               300
 #define USB_TRANSFER_RATE_MS            8
-
-#define ENABLE_IAP_PIN                  0
-
-SBIT(EnableIAP, 0x90, ENABLE_IAP_PIN);
 
 __code uint8_t  SetupGetDevDescr[] = { USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_DEVICE, 0x00, 0x00, sizeof(USB_DEV_DESCR), 0x00 };
 __code uint8_t  SetupGetCfgDescr[] = { USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_CONFIG, 0x00, 0x00, 0x04, 0x00 };
@@ -43,30 +46,40 @@ __bit FoundNewDev;
 
 void main(void) {
     static uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;
-    uint8_t usbStatus = ERR_USB_UNKNOWN, i = 0, len = 0, endp = 0;
+    uint8_t usbStatus = ERR_USB_UNKNOWN, len = 0, endp = 0;
     uint16_t usbLocation = 0;
 
+    // Setup low level system and bootloader
     system_disableGlobalInterupts();
     system_CfgFsys();
-    system_mDelaymS(100);
+    bootloader_initialise();
 
-    P1_MOD_OC = P1_MOD_OC | (1 << ENABLE_IAP_PIN);
-    P1_DIR_PU = P1_DIR_PU |	(1 << ENABLE_IAP_PIN);
-
+    // Setup timer ticks
     tick_initialiseTimer0();
     tick_enableTimer0Interrupt();
+
+    // Setup quadrature encoder
     quadrature_initialise();
+    quadrature_startEncoding();
+
+    // Setup heartbeat LED
     heartbeat_initialise();
+
+    // Setup serial port (debug)
     serial_initialiseSerial1(SERIAL_BAUD_RATE, 0, 0);
+
+    // Setup i2c and SSD1306 OLED
     i2c_initialise();
     ssd1306_initialise();
     ssd1306_clearScreen();
 
+    // Setup and initialise USB host
     InitUSB_Host();
 
     tick_startTimer0();
     system_enableGlobalInterupts();
 
+    // Application code starts here ...
     ssd1306_setCursor(0, 0);
     ssd1306_printString("MOUSE <> QUAD RUNNING");
     serial_printString("\x1b[2J\x1b[HMOUSE <> QUAD RUNNING\n\r");
@@ -77,7 +90,6 @@ void main(void) {
             previousCountLEDFlash += LED_FLASH_RATE_MS;
 
             heartbeat_toggleState();
-            quadrature_update(QUADRATURE_X_CHANNEL);
         }
 
         if (UIF_DETECT) {
@@ -141,7 +153,7 @@ void main(void) {
                 
                         len = USB_RX_LEN;                               // received data length
                         if(len) {
-                            for(i=0; i < 4; i++) {
+                            for(uint8_t i = 0; i < 4; i++) {
                                 // Byte 0 - Buttons
                                 // Byte 1 - X
                                 // Byte 2 - Y
@@ -182,11 +194,11 @@ void main(void) {
             }
         }
 
-        if (EnableIAP == 0) {
+        if (bootloader_checkBootloaderRequest()) {
             ssd1306_clearScreen();
             ssd1306_setCursor(0, 0);
             ssd1306_printString("---- BOOT LOADER ----");
-            bootloader();
+            bootloader_enter();
         }
     }
 } 

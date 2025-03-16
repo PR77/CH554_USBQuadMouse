@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include "ch554.h"
 
-extern void (* __code bootloader)(void);
+extern void bootloader_initialise(void);
+inline uint8_t bootloader_checkBootloaderRequest(void);
+extern void (* __code bootloader_enter)(void);
 
 #endif // __CH554_BOOTLOADER_H__

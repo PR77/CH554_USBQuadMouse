@@ -30,6 +30,13 @@ static const uint8_t QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS][QUADRATURE_SEQUENC
 
 static quadratureOutput_s quadratureOutputs[QUADRATURE_CHANNELS];
 
+void quadrature_timer2Interrupt(void) __interrupt(INT_NO_TMR2) {
+
+    for (uint8_t i = 0; i < QUADRATURE_CHANNELS; i++) {
+        quadrature_channelUpdate(&quadratureOutputs[i]);
+    }
+}
+
 void quadrature_initialise(void) {
 
     // TODO...
@@ -55,11 +62,21 @@ void quadrature_initialise(void) {
     quadratureOutputs[QUADRATURE_Y_CHANNEL].channelIndex = QUADRATURE_Y_CHANNEL;
 }
 
+inline void quadrature_startEncoding(void) {
+    // ENABLE TIMER 2 INTERRUPTS
+}
+
+inline void quadrature_stopEncoding(void) {
+    // DISABLE TIMER 2 INTERRUPTS
+}
+
 void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
 
     if (channelIndex >= QUADRATURE_CHANNELS) {
         return;
     }
+
+    // DISABLE TIMER 2 INTERRUPTS
 
     if ((counts > 0) && (counts < INT8_MAX)) {
         if (quadratureOutputs[channelIndex].direction == QUADRATURE_BACKWARD) {
@@ -77,22 +94,13 @@ void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
 
     if (quadratureOutputs[channelIndex].directionChange == 1) {
         quadratureOutputs[channelIndex].directionChange = 0;
+        quadratureOutputs[channelIndex].sequenceCounts = 0;
         return;    
     }
 
     quadratureOutputs[channelIndex].sequenceCounts += abs(counts);
-}
 
-void quadrature_update(uint8_t channelIndex) {
-
-    if (channelIndex >= QUADRATURE_CHANNELS) {
-        return;
-    }
-
-    if (quadratureOutputs[channelIndex].sequenceCounts) {
-        quadratureOutputs[channelIndex].sequenceCounts--;
-        quadrature_channelUpdate(&quadratureOutputs[channelIndex]);
-    }
+    // ENABLE TIMER 2 INTERRUPTS
 }
 
 static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
@@ -115,6 +123,13 @@ static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
 
     // Sequence index check
     if (currentSequenceIndex >= QUADRATURE_SEQUENCE_STEPS) {
+        return;
+    }
+
+    // Sequence counts check
+    if (quadratureOutput->sequenceCounts) {
+        quadratureOutput->sequenceCounts--;
+    } else {
         return;
     }
 
