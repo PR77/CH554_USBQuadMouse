@@ -21,8 +21,8 @@
 void system_CfgFsys(void);
 inline void system_enableGlobalInterupts(void);
 inline void system_disableGlobalInterupts(void);
-void mDelayuS(uint16_t n);
-void mDelaymS(uint16_t n);
+void system_mDelayuS(uint16_t n);
+void system_mDelaymS(uint16_t n);
 inline void system_WDTModeSelect(uint8_t mode);
 inline void system_WDTFeed(uint8_t timerTime);
 

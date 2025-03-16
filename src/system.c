@@ -63,13 +63,13 @@ inline void system_disableGlobalInterupts(void) {
 }
 
 /*******************************************************************************
-* Function Name  : mDelayus(UNIT16 n)
+* Function Name  : system_mDelayus(UNIT16 n)
 * Description    : us delay function
 * Input          : UNIT16 n
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void mDelayuS(uint16_t n) {
+void system_mDelayuS(uint16_t n) {
 #ifdef FREQ_SYS
 #if FREQ_SYS <= 6000000
     n >>= 2;
@@ -120,13 +120,13 @@ void mDelayuS(uint16_t n) {
 }
 
 /*******************************************************************************
-* Function Name  : mDelayms(UNIT16 n)
+* Function Name  : system_mDelayms(UNIT16 n)
 * Description    : ms delay function
 * Input          : UNIT16 n
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void mDelaymS(uint16_t n) {
+void system_mDelaymS(uint16_t n) {
 
     while (n) {
 #ifdef DELAY_MS_HW
@@ -135,7 +135,7 @@ void mDelaymS(uint16_t n) {
         while (TKEY_CTRL & bTKC_IF)
             ;
 #else
-        mDelayuS(1000);
+        system_mDelayuS(1000);
 #endif
         --n;
     }

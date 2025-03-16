@@ -12,8 +12,8 @@
 #pragma disable_warning 84
 #pragma disable_warning 110
 
-#define DLY_ms(x)   mDelaymS(x)
-#define DLY_us(x)   mDelayuS(x)
+#define DLY_ms(x)   system_mDelaymS(x)
+#define DLY_us(x)   system_mDelayuS(x)
 
 __bit HubLowSpeed;
 

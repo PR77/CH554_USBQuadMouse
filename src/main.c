@@ -48,6 +48,7 @@ void main(void) {
 
     system_disableGlobalInterupts();
     system_CfgFsys();
+    system_mDelaymS(100);
 
     P1_MOD_OC = P1_MOD_OC | (1 << ENABLE_IAP_PIN);
     P1_DIR_PU = P1_DIR_PU |	(1 << ENABLE_IAP_PIN);
@@ -69,6 +70,8 @@ void main(void) {
     ssd1306_setCursor(0, 0);
     ssd1306_printString("MOUSE <> QUAD RUNNING");
     serial_printString("\x1b[2J\x1b[HMOUSE <> QUAD RUNNING\n\r");
+
+    quadrature_updateCounts(QUADRATURE_X_CHANNEL, 10);
     
     while (1) {
 
@@ -76,6 +79,7 @@ void main(void) {
             previousCountLEDFlash += LED_FLASH_RATE_MS;
 
             heartbeat_toggleState();
+            quadrature_update(QUADRATURE_X_CHANNEL);
         }
 
         if (UIF_DETECT) {

@@ -56,9 +56,7 @@ void quadrature_initialise(void) {
 
 void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
 
-    uint8_t currentSequenceIndex = 0;
-
-    if (QUADRATURE_CHANNELS >= channelIndex) {
+    if (channelIndex >= QUADRATURE_CHANNELS) {
         return;
     }
 
@@ -71,9 +69,7 @@ void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
 
 void quadrature_update(uint8_t channelIndex) {
 
-    uint8_t currentSequenceIndex = 0;
-
-    if (QUADRATURE_CHANNELS >= channelIndex) {
+    if (channelIndex >= QUADRATURE_CHANNELS) {
         return;
     }
 
@@ -81,7 +77,8 @@ void quadrature_update(uint8_t channelIndex) {
     // check direction change
     // process counts
 
-    if (quadratureOutputs[channelIndex].sequenceCounts--) {
+    if (quadratureOutputs[channelIndex].sequenceCounts) {
+        quadratureOutputs[channelIndex].sequenceCounts--;
         quadrature_channelUpdate(&quadratureOutputs[channelIndex]);
     }
 }
@@ -98,7 +95,7 @@ static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
     currentChannelIndex = quadratureOutput->channelIndex;
 
     // Channel index check
-    if (QUADRATURE_CHANNELS >= currentChannelIndex) {
+    if (currentChannelIndex >= QUADRATURE_CHANNELS) {
         return;
     }
 
