@@ -89,10 +89,6 @@ void quadrature_update(uint8_t channelIndex) {
         return;
     }
 
-    // TODO...
-    // check direction change
-    // process counts
-
     if (quadratureOutputs[channelIndex].sequenceCounts) {
         quadratureOutputs[channelIndex].sequenceCounts--;
         quadrature_channelUpdate(&quadratureOutputs[channelIndex]);
