@@ -8,7 +8,6 @@
 *******************************************************************************/
 
 #include <stdint.h>
-#include <stdio.h>
 #include <compiler.h>
 #include "ch554.h"
 #include "heartbeat.h"
@@ -184,10 +183,10 @@ void main(void) {
                             ssd1306_printHexByte((uint8_t)(RxBuffer[2]));
                         }
                     } else if (usbStatus != (USB_PID_NAK | ERR_USB_TRANSFER)) {
-                        ssd1306_printString("MOUSE ERROR         ");
+                        ssd1306_printString("MOUSE ERROR DETECTED ");
                     }
                 } else {
-                    ssd1306_printString("NO INT END POINT    ");
+                    ssd1306_printString("NO INTRPT END POINT  ");
                 }
                 
                 SetUsbSpeed(1);                                     // default is full speed
