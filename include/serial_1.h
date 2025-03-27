@@ -40,17 +40,29 @@ void serial_UART1Interrupt(void) __interrupt(INT_NO_UART1);
 inline void serial_initialiseSerial1(uint32_t baudRate, uint8_t alternativePins);
 inline void serial_disableSerial1Interrupt(void);
 inline void serial_enableSerial1Interrupt(void);
-uint8_t serial_getByteSerial1(void);
+
 #if defined(SERIAL_ENABLE_TX_INTERRUPTS)
 void serial_sendByteSerial1Interrupt(uint8_t character);
-#elif
+#else
 void serial_sendByteSerial1Blocking(uint8_t character);
-#endif
+#endif // SERIAL_ENABLE_TX_INTERRUPTS
+
+#if defined(SERIAL_ENABLE_RX_INTERRUPTS)
+uint8_t serial_getByteSerial1Interrupt(void);
+#else
+uint8_t serial_getByteSerial1Blocking(void);
+#endif // SERIAL_ENABLE_RX_INTERRUPTS
 
 #if defined(SERIAL_ENABLE_TX_INTERRUPTS)
 #define serial_sendByteSerial1(character)   serial_sendByteSerial1Interrupt(character)
-#elif
+#else
 #define serial_sendByteSerial1(character)   serial_sendByteSerial1Blocking(character)
+#endif
+
+#if defined(SERIAL_ENABLE_RX_INTERRUPTS)
+#define serial_getByteSerial1(character)   serial_getByteSerial1Interrupt(character)
+#else
+#define serial_getByteSerial1(character)   serial_getByteSerial1Blocking(character)
 #endif
 
 #endif // __CH554_SERIAL_1_H__

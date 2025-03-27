@@ -95,7 +95,12 @@ inline void serial_enableSerial1Interrupt(void) {
     }
 }
 
-uint8_t serial_getByteSerial1(void) {
+uint8_t serial_getByteSerial1Interrupt(void) {
+    
+    return (0);
+}
+
+uint8_t serial_getByteSerial1Blocking(void) {
     
     while (U1RI == 0);                  // wait for receive interrupt flag (RI == 1)
     U1RI = 0;
