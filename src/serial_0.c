@@ -46,10 +46,8 @@ inline void serial_initialiseSerial0(uint32_t baudRate, uint8_t alternativePins,
     }
 
     if (enableInterrupt) {
-        ES = 1;
         GPIO_IE = GPIO_IE | bIE_RXD0_LO;
     } else {
-        ES = 0;
         GPIO_IE = GPIO_IE & ~bIE_RXD0_LO;
     }
 }

@@ -31,7 +31,7 @@ __code uint8_t SetupSetUsbInterface[] = { USB_REQ_RECIP_INTERF, USB_SET_INTERFAC
 __code uint8_t SetupClrEndpStall[] = { USB_REQ_TYP_OUT | USB_REQ_RECIP_ENDP, USB_CLEAR_FEATURE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 __code uint8_t SetupSetHIDIdle[]= { 0x21, HID_SET_IDLE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 __code uint8_t SetupGetHIDDevReport[] = { 0x81, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_REPORT, 0x00, 0x00, 0xFF, 0x00 };
-__code uint8_t SetupGetHubDescr[] = { HUB_GET_HUB_DESCRIPTOR, HUB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_HUB, 0x00, 0x00, sizeof( USB_HUB_DESCR ), 0x00 };
+__code uint8_t SetupGetHubDescr[] = { HUB_GET_HUB_DESCRIPTOR, HUB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_HUB, 0x00, 0x00, sizeof(USB_HUB_DESCR), 0x00 };
 
 __xdata uint8_t UsbDevEndp0Size;                                                      
 __xdata __at (0x0000) uint8_t RxBuffer[ MAX_PACKET_SIZE ];  // IN, must even address
@@ -44,7 +44,7 @@ __bit FoundNewDev;
 
 void main(void) {
     static uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;
-    uint8_t usbStatus = ERR_USB_UNKNOWN, len = 0, endp = 0;
+    uint8_t usbStatus = (uint8_t)ERR_USB_UNKNOWN, len = 0, endp = 0;
     uint16_t usbLocation = 0;
 
     // Setup low level system and bootloader
@@ -64,7 +64,7 @@ void main(void) {
     heartbeat_initialise();
 
     // Setup serial port (debug)
-    serial_initialiseSerial1(SERIAL_BAUD_RATE, 0, 0);
+    serial_initialiseSerial1(SERIAL_BAUD_RATE, 0);
 
     // Setup i2c and SSD1306 OLED
     i2c_initialise();
@@ -80,7 +80,7 @@ void main(void) {
     // Application code starts here ...
     ssd1306_setCursor(0, 0);
     ssd1306_printString("MOUSE <> QUAD RUNNING");
-    serial_printString("\x1b[2J\x1b[HMOUSE <> QUAD RUNNING\n\r");
+    serial_printString("\x1b[2J\x1b[HMOUSE <> QUADRATURE ENCODER RUNNING\n\r");
 
     while (1) {
 
