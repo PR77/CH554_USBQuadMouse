@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <compiler.h>
 #include "ch554.h"
+#include "tick.h"
 #include "serial_1.h"
 
 #if defined(SERIAL_ENABLE_TX_INTERRUPTS)
@@ -29,7 +30,20 @@ void serial_UART1Interrupt(void) __interrupt(INT_NO_UART1) {
 	uint8_t receivedData = 0;
 
 	if (U1RI) {
+        volatile uint8_t nextWriteIndex = 0;
+
 		U1RI = 0;
+        receivedData = SBUF1;
+
+        nextWriteIndex = (serial_receiveWriteIndex + 1) & SERIAL_RX_BUFFER_MASK;
+    
+        if (nextWriteIndex != serial_receiveReadIndex) {
+            // Check if receive buffer is not full, otherwise need to drop
+            // received data.
+
+            serial_receiveBuffer[serial_receiveWriteIndex] = receivedData;
+            serial_receiveWriteIndex = nextWriteIndex;
+        }
 	}
 
     if (U1TI) {
@@ -95,14 +109,43 @@ inline void serial_enableSerial1Interrupt(void) {
     }
 }
 
-uint8_t serial_getByteSerial1Interrupt(void) {
+uint16_t serial_getByteSerial1Interrupt(uint32_t timeout) {
+    uint16_t receivedData = RECEIVE_NO_DATA_AVAIL;
+    uint32_t previousCountTimeout = tick_get1msTimerCount();
+
+    // If receive buffer is empty, then block for timeout period
+    // otherwise break out or report RECEIVE_TIMEOUT.
+    while (serial_receiveWriteIndex == serial_receiveReadIndex) {
+
+        if ((tick_get1msTimerCount() - previousCountTimeout) > timeout) {
+            return (RECEIVE_TIMEOUT);
+        }
+    }
+
+    // If receive buffer is not empty
+    if (serial_receiveWriteIndex != serial_receiveReadIndex) {
+        // Get one byte from buffer and pass it along to the caller
+        receivedData = serial_receiveBuffer[serial_receiveReadIndex];
+
+        // Calculate and store new buffer index
+        serial_receiveReadIndex = (serial_receiveReadIndex + 1) & SERIAL_RX_BUFFER_MASK;
+    }
     
-    return (0);
+    return (receivedData);
 }
 
-uint8_t serial_getByteSerial1Blocking(void) {
-    
-    while (U1RI == 0);                  // wait for receive interrupt flag (RI == 1)
+uint16_t serial_getByteSerial1Blocking(uint32_t timeout) {
+    uint32_t previousCountTimeout = tick_get1msTimerCount();
+
+    // If receive indicator is not set, then block for timeout period
+    // otherwise break out and report RECEIVE_TIMEOUT.
+    while (U1RI == 0) {
+
+        if ((tick_get1msTimerCount() - previousCountTimeout) > timeout) {
+            return (RECEIVE_TIMEOUT);
+        }
+    }
+
     U1RI = 0;
 
     return (SBUF1);

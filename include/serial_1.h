@@ -15,14 +15,14 @@
 #include "serial_cfg.h"
 
 #define SERIAL_ENABLE_TX_INTERRUPTS
-#undef SERIAL_ENABLE_RX_INTERRUPTS
+#define SERIAL_ENABLE_RX_INTERRUPTS
 
 #ifndef SERIAL_TX_BUFFER_SIZE
 #define SERIAL_TX_BUFFER_SIZE   8
 #endif
 
 #ifndef SERIAL_RX_BUFFER_SIZE
-#define SERIAL_RX_BUFFER_SIZE   8
+#define SERIAL_RX_BUFFER_SIZE   4
 #endif
 
 #define SERIAL_TX_BUFFER_MASK   (SERIAL_TX_BUFFER_SIZE - 1)
@@ -48,9 +48,9 @@ void serial_sendByteSerial1Blocking(uint8_t character);
 #endif // SERIAL_ENABLE_TX_INTERRUPTS
 
 #if defined(SERIAL_ENABLE_RX_INTERRUPTS)
-uint8_t serial_getByteSerial1Interrupt(void);
+uint16_t serial_getByteSerial1Interrupt(uint32_t timeout);
 #else
-uint8_t serial_getByteSerial1Blocking(void);
+uint16_t serial_getByteSerial1Blocking(uint32_t timeout);
 #endif // SERIAL_ENABLE_RX_INTERRUPTS
 
 #if defined(SERIAL_ENABLE_TX_INTERRUPTS)
@@ -60,9 +60,9 @@ uint8_t serial_getByteSerial1Blocking(void);
 #endif
 
 #if defined(SERIAL_ENABLE_RX_INTERRUPTS)
-#define serial_getByteSerial1(character)   serial_getByteSerial1Interrupt(character)
+#define serial_getByteSerial1(timeout)      serial_getByteSerial1Interrupt(timeout)
 #else
-#define serial_getByteSerial1(character)   serial_getByteSerial1Blocking(character)
+#define serial_getByteSerial1(timeout)      serial_getByteSerial1Blocking(timeout)
 #endif
 
 #endif // __CH554_SERIAL_1_H__

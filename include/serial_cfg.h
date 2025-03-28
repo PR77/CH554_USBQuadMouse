@@ -17,6 +17,9 @@
 #define SERIAL_BAUD_RATE        38400
 #endif
 
+#define RECEIVE_TIMEOUT         (uint16_t)UINT16_MAX
+#define RECEIVE_NO_DATA_AVAIL   (uint16_t)(UINT16_MAX - 1)
+
 #ifndef CONSOLE_PORT_PUTCHR
 #define CONSOLE_PORT_PUTCHR(x)  serial_sendByteSerial1(x)
 #endif
