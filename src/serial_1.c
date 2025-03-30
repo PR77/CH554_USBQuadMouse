@@ -27,10 +27,9 @@ static volatile uint8_t serial_receiveReadIndex;
 #endif
 
 void serial_UART1Interrupt(void) __interrupt(INT_NO_UART1) {
-	uint8_t receivedData = 0;
 
 	if (U1RI) {
-        volatile uint8_t nextWriteIndex = 0;
+        volatile uint8_t nextWriteIndex = 0, receivedData = 0;
 
 		U1RI = 0;
         receivedData = SBUF1;
