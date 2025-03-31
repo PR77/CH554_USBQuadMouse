@@ -12,7 +12,7 @@
 #include "bootloader.h"
 #include "bootloader_cfg.h"
 
-SBIT(BOOTLOADER_REQUEST, 0x90, BOOTLOADER_PIN);
+SBIT(BOOTLOADER_REQUEST, BOOTLOADER_PORT, BOOTLOADER_PIN);
 
 void bootloader_initialise(void) {
 
