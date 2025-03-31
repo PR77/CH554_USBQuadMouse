@@ -141,6 +141,7 @@ uint16_t serial_getByteSerial1Interrupt(uint32_t timeout) {
 }
 #endif // SERIAL_1_ENABLE_RX_INTERRUPTS
 
+#if !defined(SERIAL_1_ENABLE_RX_INTERRUPTS)
 uint16_t serial_getByteSerial1Blocking(uint32_t timeout) {
     uint32_t previousCountTimeout = tick_get1msTimerCount();
 
@@ -157,6 +158,7 @@ uint16_t serial_getByteSerial1Blocking(uint32_t timeout) {
 
     return (SBUF1);
 }
+#endif // ! SERIAL_1_ENABLE_RX_INTERRUPTS
 
 #if defined(SERIAL_1_ENABLE_TX_INTERRUPTS)
 void serial_sendByteSerial1Interrupt(uint8_t character) {
@@ -188,6 +190,7 @@ void serial_sendByteSerial1Interrupt(uint8_t character) {
 }
 #endif // SERIAL_1_ENABLE_TX_INTERRUPTS
 
+#if !defined(SERIAL_1_ENABLE_TX_INTERRUPTS)
 void serial_sendByteSerial1Blocking(uint8_t character) {
     SBUF1 = character;
     
@@ -198,3 +201,4 @@ void serial_sendByteSerial1Blocking(uint8_t character) {
 
     U1TI = 0;
 }
+#endif // ! SERIAL_1_ENABLE_TX_INTERRUPTS
