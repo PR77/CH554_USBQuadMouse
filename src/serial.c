@@ -28,8 +28,10 @@ void serial_printString(char* string) {
         return;
     }
     
-    while (*string) {                   // repeat until string terminator
-        CONSOLE_PORT_PUTCHR(*string++);  // print character on OLED
+    while (*string) {
+        // Repeat until string terminator reached printing each character
+        // on the console.
+        CONSOLE_PORT_PUTCHR(*string++);
     }
 }
 
