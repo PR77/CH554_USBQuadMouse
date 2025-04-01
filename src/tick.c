@@ -51,7 +51,7 @@ inline void tick_disableTimer0Interrupt(void) {
 inline void tick_enableTimer0Interrupt(void) {
 
     if (ET0 == 0) {
-        ET0 = 1;                    // only if already disabled, then emable timer interrupt
+        ET0 = 1;                    // only if already disabled, then enable timer interrupt
     }
 }
 

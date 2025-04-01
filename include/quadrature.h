@@ -30,7 +30,19 @@ typedef struct {
 
 } quadratureOutput_s;
 
-void quadrature_initialise(void);
+typedef enum {
+
+    encodingRate1Hz = 0,
+    encodingRate1000Hz,
+    encodingRate2000Hz,
+    encodingRate4000Hz,
+    encodingRate8000Hz,
+    encodingRate12000Hz,
+    encodingRateMaximum
+
+} encodingRate_e;
+
+void quadrature_initialise(encodingRate_e encodingRate);
 inline void quadrature_startEncoding(void);
 inline void quadrature_stopEncoding(void);
 void quadrature_updateCounts(uint8_t channelIndex, int8_t counts);

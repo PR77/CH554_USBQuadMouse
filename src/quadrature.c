@@ -37,7 +37,7 @@ void quadrature_timer2Interrupt(void) __interrupt(INT_NO_TMR2) {
     }
 }
 
-void quadrature_initialise(void) {
+void quadrature_initialise(encodingRate_e encodingRate) {
 
     // TODO...
     // NOT PUSH PULL --- NEEDS TO BE WEAK PULLUP, BUT CHECK AGAINST SCHEMATICS!!!
@@ -63,11 +63,19 @@ void quadrature_initialise(void) {
 }
 
 inline void quadrature_startEncoding(void) {
-    // ENABLE TIMER 2 INTERRUPTS
+
+    if (ET2 == 0) {
+        // Only if already disabled, then enable timer 2 interrupt.
+        ET2 = 1;
+    }
 }
 
 inline void quadrature_stopEncoding(void) {
-    // DISABLE TIMER 2 INTERRUPTS
+
+    if (ET2 == 1) {
+        // Only if already enabled, then disable timer 2 interrupt.
+        ET2 = 0;
+    }
 }
 
 void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
