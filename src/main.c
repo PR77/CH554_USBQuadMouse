@@ -58,7 +58,6 @@ void main(void) {
 
     // Setup quadrature encoder
     quadrature_initialise(encodingRate1Hz);
-    quadrature_startEncoding();
 
     // Setup heartbeat LED
     heartbeat_initialise();
@@ -82,12 +81,22 @@ void main(void) {
     ssd1306_printString("MOUSE <> QUAD RUNNING");
     serial_printString("\x1b[2J\x1b[HMOUSE <> QUADRATURE ENCODER RUNNING\n\r");
 
+    quadrature_startEncoding();
+
     while (1) {
+
+        /*
+        TO DO: Better debug the RX handling. It seems _if_ the RX buffer is quickly
+        filled, the timeout loop may not break out.
+
+        if (serial_isDataAvailable() == RECEIVE_DATA_AVAIL)
+            CONSOLE_PORT_PUTCHR((uint8_t)serial_getByteSerial1(1));
+        */
 
         if ((tick_get1msTimerCount() - previousCountLEDFlash) > LED_FLASH_RATE_MS) {
             previousCountLEDFlash += LED_FLASH_RATE_MS;
 
-            heartbeat_toggleState();
+            //heartbeat_toggleState();
         }
 
         if (UIF_DETECT) {

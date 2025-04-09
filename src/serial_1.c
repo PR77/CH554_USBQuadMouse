@@ -115,16 +115,29 @@ inline void serial_enableSerial1Interrupt(void) {
 }
 
 #if defined(SERIAL_1_ENABLE_RX_INTERRUPTS)
+uint16_t serial_isDataAvailableSerial1Interrupt(void) {
+
+    // If receive buffer is not empty, then return RECEIVE_DATA_AVAIL.
+    if (serial_receiveWriteIndex != serial_receiveReadIndex) {
+        return (RECEIVE_DATA_AVAIL);
+    }
+
+    return (RECEIVE_NO_DATA_AVAIL);
+}
+
 uint16_t serial_getByteSerial1Interrupt(uint32_t timeout) {
     uint16_t receivedData = RECEIVE_NO_DATA_AVAIL;
     uint32_t previousCountTimeout = tick_get1msTimerCount();
 
-    // If receive buffer is empty, then block for timeout period
-    // otherwise break out or report RECEIVE_TIMEOUT.
-    while (serial_receiveWriteIndex == serial_receiveReadIndex) {
+    // If receive buffer is empty, then block for timeout period only if
+    // timeout period is !0.
+    // If timeout occurs, then break out or report RECEIVE_TIMEOUT.
+    if (timeout != 0) {
+        while (serial_receiveWriteIndex == serial_receiveReadIndex) {
 
-        if ((tick_get1msTimerCount() - previousCountTimeout) > timeout) {
-            return (RECEIVE_TIMEOUT);
+            if ((tick_get1msTimerCount() - previousCountTimeout) > timeout) {
+                return (RECEIVE_TIMEOUT);
+            }
         }
     }
 

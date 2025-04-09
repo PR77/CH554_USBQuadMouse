@@ -16,6 +16,8 @@
 #include "quadrature.h"
 #include "quadrature_cfg.h"
 
+#include "heartbeat.h"
+
 #define ENABLE_QUADRATURE_DEBUG
 
 SBIT(QUADRATURE_XA, QUADRATURE_PORT, QUADRATURE_XA_PIN);
@@ -32,9 +34,13 @@ static quadratureOutput_s quadratureOutputs[QUADRATURE_CHANNELS];
 
 void quadrature_timer2Interrupt(void) __interrupt(INT_NO_TMR2) {
 
-    for (uint8_t i = 0; i < QUADRATURE_CHANNELS; i++) {
-        quadrature_channelUpdate(&quadratureOutputs[i]);
-    }
+    TF2 = 0;
+    
+    heartbeat_toggleState();
+
+    //for (uint8_t i = 0; i < QUADRATURE_CHANNELS; i++) {
+    //    quadrature_channelUpdate(&quadratureOutputs[i]);
+    //}
 }
 
 void quadrature_initialise(encodingRate_e encodingRate) {
@@ -60,6 +66,18 @@ void quadrature_initialise(encodingRate_e encodingRate) {
 
     quadratureOutputs[QUADRATURE_X_CHANNEL].channelIndex = QUADRATURE_X_CHANNEL;
     quadratureOutputs[QUADRATURE_Y_CHANNEL].channelIndex = QUADRATURE_Y_CHANNEL;
+
+#define TIMER_RELOAD_VALUE_MS(x)    (uint16_t)(0xFFFF - (uint32_t)((FREQ_SYS/12)/(x * 1000)))
+
+    RCLK = 0;
+    TCLK = 0;
+    C_T2 = 0;
+    CP_RL2 = 0;
+    T2MOD = T2MOD & ~bT2_CLK;
+    T2MOD = T2MOD & ~T2OE;
+    T2COUNT = 0; //0xFFFF; //TIMER_RELOAD_VALUE_MS(1000);
+    RCAP2 = 0x2000; //TIMER_RELOAD_VALUE_MS(1000);
+    TR2 = 1;
 }
 
 inline void quadrature_startEncoding(void) {
