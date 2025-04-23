@@ -14,11 +14,13 @@
 #include "ch554.h"
 #include "quadrature_cfg.h"
 
-#define QUADRATURE_LOW          (uint8_t)0
-#define QUADRATURE_HIGH         !QUADRATURE_LOW
+#define QUADRATURE_LOW              (uint8_t)0
+#define QUADRATURE_HIGH             !QUADRATURE_LOW
 
-#define QUADRATURE_FORWARD      (uint8_t)0
-#define QUADRATURE_BACKWARD     !QUADRATURE_FORWARD
+#define QUADRATURE_FORWARD          (uint8_t)0
+#define QUADRATURE_BACKWARD         !QUADRATURE_FORWARD
+
+#define TIMER_RELOAD_VALUE_HZ(x)    (uint16_t)(0xFFFF - (uint32_t)((FREQ_SYS/12)/(x)))
 
 typedef struct {
 
@@ -32,12 +34,12 @@ typedef struct {
 
 typedef enum {
 
-    encodingRate1Hz = 0,
-    encodingRate1000Hz,
-    encodingRate2000Hz,
-    encodingRate4000Hz,
-    encodingRate8000Hz,
-    encodingRate12000Hz,
+    encodingRate60Hz = 1,
+    encodingRate1000Hz = 1000,
+    encodingRate2000Hz = 2000,
+    encodingRate4000Hz = 4000,
+    encodingRate8000Hz = 8000,
+    encodingRate12000Hz = 12000,
     encodingRateMaximum
 
 } encodingRate_e;

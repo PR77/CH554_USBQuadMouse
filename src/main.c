@@ -14,11 +14,14 @@
 #include "system.h"
 #include "tick.h"
 #include "quadrature.h"
+#include "buttons.h"
 #include "i2c.h"
 #include "ssd1306.h"
 #include "usbhost.h"
 #include "serial.h"
 #include "bootloader.h"
+
+#define CONSOLE_DEBUG_ENABLED
 
 #define LED_FLASH_RATE_MS           300
 #define USB_TRANSFER_RATE_MS        8
@@ -57,7 +60,7 @@ void main(void) {
     tick_enableTimer0Interrupt();
 
     // Setup quadrature encoder
-    quadrature_initialise(encodingRate1Hz);
+    quadrature_initialise(encodingRate12000Hz);
 
     // Setup heartbeat LED
     heartbeat_initialise();
@@ -72,6 +75,9 @@ void main(void) {
 
     // Setup and initialise USB host
     InitUSB_Host();
+
+    // Setup buttons
+    buttons_initialise();
 
     tick_startTimer0();
     system_enableGlobalInterupts();
@@ -88,15 +94,17 @@ void main(void) {
         /*
         TO DO: Better debug the RX handling. It seems _if_ the RX buffer is quickly
         filled, the timeout loop may not break out.
-
-        if (serial_isDataAvailable() == RECEIVE_DATA_AVAIL)
-            CONSOLE_PORT_PUTCHR((uint8_t)serial_getByteSerial1(1));
         */
+
+#if defined(CONSOLE_DEBUG_ENABLED)
+        if (serial_isDataAvailable() == RECEIVE_DATA_AVAIL)
+            CONSOLE_PORT_PUTCHR((uint8_t)serial_getByteSerial1(0));
+#endif // CONSOLE_DEBUG_ENABLED
 
         if ((tick_get1msTimerCount() - previousCountLEDFlash) > LED_FLASH_RATE_MS) {
             previousCountLEDFlash += LED_FLASH_RATE_MS;
 
-            //heartbeat_toggleState();
+            heartbeat_toggleState();
         }
 
         if (UIF_DETECT) {
@@ -107,6 +115,10 @@ void main(void) {
 
                 ssd1306_setCursor(0, 1);
                 ssd1306_printString("CONNECTED USB DEVICE ");
+                ssd1306_setCursor(0, 2);
+                ssd1306_printString("                     ");
+                ssd1306_setCursor(0, 3);
+                ssd1306_printString("                     ");
             }
 
             if (ERR_USB_DISCON == usbStatus) {
@@ -127,7 +139,7 @@ void main(void) {
             usbStatus = EnumAllRootDevice();
             if (ERR_SUCCESS != usbStatus) {
                 ssd1306_setCursor(0, 2);
-                ssd1306_printString("ENUMERATION ERROR    ");
+                ssd1306_printString("ENUMERATION ERROR  ");
                 ssd1306_printHexByte(usbStatus);
             }
         }
@@ -137,7 +149,7 @@ void main(void) {
 
             usbLocation = SearchTypeDevice(DEV_TYPE_MOUSE);
 
-            if(usbLocation != 0xFFFF) {                                     // found a mouse (how to deal with two mice?)
+            if (usbLocation != 0xFFFF) {                                     // found a mouse (how to deal with two mice?)
                 ssd1306_setCursor(0, 2);
                 ssd1306_printString("ENUMERATION LOC ");
                 ssd1306_printHexWord(usbLocation);
@@ -145,22 +157,30 @@ void main(void) {
                 ssd1306_setCursor(0, 3);
                 SelectHubPort(usbLocation);                                 // select to operate designated ROOT-HUB port, set current USB speed and USB address of operated device
                 usbLocation = usbLocation >> 8;                             // CH554 has only one USB, only the lower eight bits are required
-                endp = usbLocation ? DevOnHubPort[usbLocation-1].GpVar[0] : ThisUsbDev.GpVar[0];  // address of interrupt endpoint, bit 7 is used for synchronization flag bit
-                
-                if(endp & USB_ENDP_ADDR_MASK) {                             // endpoint valid
-                    usbStatus = USBHostTransact(USB_PID_IN << 4 | endp & 0x7F, endp & 0x80 ? bUH_R_TOG | bUH_T_TOG : 0, 0); // CH554 transmit transaction, get data, NAK does not retry
-                    if(usbStatus == ERR_SUCCESS) {
+
+                if (usbLocation) {
+                    endp = DevOnHubPort[usbLocation-1].GpVar[0];            // address of interrupt endpoint, bit 7 is used for synchronization flag bit
+                } else {
+                    endp = ThisUsbDev.GpVar[0];
+                }
+
+                if (endp & USB_ENDP_ADDR_MASK) {                             // endpoint valid
+                    // CH554 transmit transaction, get data, NAK does not retry
+                    usbStatus = USBHostTransact(USB_PID_IN << 4 | endp & 0x7F, endp & 0x80 ? bUH_R_TOG | bUH_T_TOG : 0, 0);
+                    if (usbStatus == ERR_SUCCESS) {
                         endp ^= 0x80;                                       // flip sync flag
 
-                        if(usbLocation) {
+                        if (usbLocation) {
                             DevOnHubPort[usbLocation-1].GpVar[0] = endp;    // save synchronization flag
                         } else { 
                             ThisUsbDev.GpVar[0] = endp;
                         }
                 
                         len = USB_RX_LEN;                                   // received data length
-                        if(len) {
-                            for(uint8_t i = 0; i < 4; i++) {
+                        if (len) {
+                            static int8_t previousXCounts = 0, previousYCounts = 0;
+
+                            for (uint8_t i = 0; i < 4; i++) {
                                 // Byte 0 - Buttons
                                 // Byte 1 - X
                                 // Byte 2 - Y
@@ -171,9 +191,12 @@ void main(void) {
 
                             ssd1306_setCursor(10, 3);
                             if ((uint8_t)(RxBuffer[0]) & 0x01) {
+                                buttons_leftButton(1);
                                 ssd1306_printString("L");
-                                quadrature_updateCounts(QUADRATURE_X_CHANNEL, 10);
-                            } else ssd1306_printString("-");
+                            } else {
+                                buttons_leftButton(0);
+                                ssd1306_printString("-");
+                            }
 
                             ssd1306_setCursor(11, 3);
                             if ((uint8_t)(RxBuffer[0]) & 0x04) {
@@ -182,9 +205,22 @@ void main(void) {
                             
                             ssd1306_setCursor(12, 3);
                             if ((uint8_t)(RxBuffer[0]) & 0x02) {
+                                buttons_rightButton(1);
                                 ssd1306_printString("R, ");
-                                quadrature_updateCounts(QUADRATURE_X_CHANNEL, -10);
-                            } else ssd1306_printString("-, ");
+                            } else {
+                                buttons_rightButton(0);
+                                ssd1306_printString("-, ");
+                            }
+
+                            if (previousXCounts != (int8_t)(RxBuffer[1])) {
+                                previousXCounts = (int8_t)(RxBuffer[1]);
+                                quadrature_updateCounts(QUADRATURE_X_CHANNEL, previousXCounts);
+                            }
+
+                            if (previousYCounts != (int8_t)(RxBuffer[2])) {
+                                previousYCounts = (int8_t)(RxBuffer[2]);
+                                quadrature_updateCounts(QUADRATURE_Y_CHANNEL, previousYCounts);
+                            }
 
                             ssd1306_printHexByte((uint8_t)(RxBuffer[1]));
                             ssd1306_printString(", ");
@@ -196,8 +232,6 @@ void main(void) {
                 } else {
                     ssd1306_printString("NO INTRPT END POINT  ");
                 }
-                
-                SetUsbSpeed(1);                                             // default is full speed
             }
         }
 
