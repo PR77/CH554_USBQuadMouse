@@ -32,32 +32,68 @@
 #define QUADRATURE_SEQUENCE_STEPS   4
 #endif
 
-#ifndef QUADRATURE_PORT
-#define QUADRATURE_PORT             0xB0
+#ifndef QUADRATURE_XA_PORT
+#define QUADRATURE_XA_PORT          0xB0
 #endif
 
-#ifndef QUADRATURE_MOD_OC
-#define QUADRATURE_MOD_OC           P3_MOD_OC
+#ifndef QUADRATURE_XB_PORT
+#define QUADRATURE_XB_PORT          0x90
 #endif
 
-#ifndef QUADRATURE_DIR_PU
-#define QUADRATURE_DIR_PU           P3_DIR_PU
+#ifndef QUADRATURE_XA_MOD_OC
+#define QUADRATURE_XA_MOD_OC        P3_MOD_OC
+#endif
+
+#ifndef QUADRATURE_XA_DIR_PU
+#define QUADRATURE_XA_DIR_PU        P3_DIR_PU
+#endif
+
+#ifndef QUADRATURE_XB_MOD_OC
+#define QUADRATURE_XB_MOD_OC        P1_MOD_OC
+#endif
+
+#ifndef QUADRATURE_XB_DIR_PU
+#define QUADRATURE_XB_DIR_PU        P1_DIR_PU
+#endif
+
+#ifndef QUADRATURE_YA_PORT
+#define QUADRATURE_YA_PORT          0xB0
+#endif
+
+#ifndef QUADRATURE_YB_PORT
+#define QUADRATURE_YB_PORT          0x90
+#endif
+
+#ifndef QUADRATURE_YA_MOD_OC
+#define QUADRATURE_YA_MOD_OC        P3_MOD_OC
+#endif
+
+#ifndef QUADRATURE_YA_DIR_PU
+#define QUADRATURE_YA_DIR_PU        P3_DIR_PU
+#endif
+
+#ifndef QUADRATURE_YB_MOD_OC
+#define QUADRATURE_YB_MOD_OC        P1_MOD_OC
+#endif
+
+#ifndef QUADRATURE_YB_DIR_PU
+#define QUADRATURE_YB_DIR_PU        P1_DIR_PU
 #endif
 
 #ifndef QUADRATURE_XA_PIN
-#define QUADRATURE_XA_PIN           0
+#define QUADRATURE_XA_PIN           1
 #endif
 
 #ifndef QUADRATURE_XB_PIN
-#define QUADRATURE_XB_PIN           1
+#define QUADRATURE_XB_PIN           0
 #endif
 
 #ifndef QUADRATURE_YA_PIN
-#define QUADRATURE_YA_PIN           3
+#define QUADRATURE_YA_PIN           0
 #endif
 
 #ifndef QUADRATURE_YB_PIN
-#define QUADRATURE_YB_PIN           4
+#define QUADRATURE_YB_PIN           1 
 #endif
 
 #endif // __CH554_QUADRATURE_CFG_H__

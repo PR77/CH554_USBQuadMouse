@@ -14,19 +14,19 @@
 #include "ch554.h"
 
 #ifndef BOOTLOADER_PORT
-#define BOOTLOADER_PORT         0x90
+#define BOOTLOADER_PORT         0xB0
 #endif
 
 #ifndef BOOTLOADER_MOD_OC
-#define BOOTLOADER_MOD_OC       P1_MOD_OC
+#define BOOTLOADER_MOD_OC       P3_MOD_OC
 #endif
 
 #ifndef BOOTLOADER_DIR_PU
-#define BOOTLOADER_DIR_PU       P1_DIR_PU
+#define BOOTLOADER_DIR_PU       P3_DIR_PU
 #endif
 
 #ifndef BOOTLOADER_PIN
-#define BOOTLOADER_PIN          0
+#define BOOTLOADER_PIN          3
 #endif
 
 #endif // __CH554_BOOTLOADER_CFG_H__

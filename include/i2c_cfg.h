@@ -23,23 +23,23 @@
 #endif
 
 #ifndef I2C_PORT
-#define I2C_PORT            0x90
+#define I2C_PORT            0xB0
 #endif
 
 #ifndef I2C_MOD_OC
-#define I2C_MOD_OC          P1_MOD_OC
+#define I2C_MOD_OC          P3_MOD_OC
 #endif
 
 #ifndef I2C_DIR_PU
-#define I2C_DIR_PU          P1_DIR_PU
+#define I2C_DIR_PU          P3_DIR_PU
 #endif
 
 #ifndef I2C_SDAT_PIN
-#define I2C_SDAT_PIN        3
+#define I2C_SDAT_PIN        1
 #endif
 
 #ifndef I2C_SCLK_PIN
-#define I2C_SCLK_PIN        2
+#define I2C_SCLK_PIN        0
 #endif
 
 #endif // __CH554_I2C_CFG_H__
