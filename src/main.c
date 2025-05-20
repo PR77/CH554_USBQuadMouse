@@ -15,6 +15,7 @@
 #include "tick.h"
 #include "quadrature.h"
 #include "buttons.h"
+#include "buzzer.h"
 #include "i2c.h"
 #include "ssd1306.h"
 #include "usbhost.h"
@@ -76,8 +77,9 @@ void main(void) {
     // Setup and initialise USB host
     InitUSB_Host();
 
-    // Setup buttons
+    // Setup buttons and buzzer
     buttons_initialise();
+    buzzer_initialise(),
 
     tick_startTimer0();
     system_enableGlobalInterupts();
@@ -105,6 +107,7 @@ void main(void) {
             previousCountLEDFlash += LED_FLASH_RATE_MS;
 
             heartbeat_toggleState();
+            buzzer_toggleBuzzer();
         }
 
         if (UIF_DETECT) {
@@ -200,6 +203,7 @@ void main(void) {
 
                             ssd1306_setCursor(11, 3);
                             if ((uint8_t)(RxBuffer[0]) & 0x04) {
+                                buzzer_updateBuzzers(1);
                                 ssd1306_printString("M");
                             } else ssd1306_printString("-");
                             
@@ -236,6 +240,7 @@ void main(void) {
         }
 
         if (bootloader_checkBootloaderRequest()) {
+            buzzer_stopBuzzer();
             ssd1306_clearScreen();
             ssd1306_setCursor(0, 0);
             ssd1306_printString("---- BOOT LOADER ----");

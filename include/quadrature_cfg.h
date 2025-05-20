@@ -37,7 +37,7 @@
 #endif
 
 #ifndef QUADRATURE_XB_PORT
-#define QUADRATURE_XB_PORT          0x90
+#define QUADRATURE_XB_PORT          0xB0
 #endif
 
 #ifndef QUADRATURE_XA_MOD_OC
@@ -49,11 +49,11 @@
 #endif
 
 #ifndef QUADRATURE_XB_MOD_OC
-#define QUADRATURE_XB_MOD_OC        P1_MOD_OC
+#define QUADRATURE_XB_MOD_OC        P3_MOD_OC
 #endif
 
 #ifndef QUADRATURE_XB_DIR_PU
-#define QUADRATURE_XB_DIR_PU        P1_DIR_PU
+#define QUADRATURE_XB_DIR_PU        P3_DIR_PU
 #endif
 
 #ifndef QUADRATURE_YA_PORT
@@ -85,7 +85,7 @@
 #endif
 
 #ifndef QUADRATURE_XB_PIN
-#define QUADRATURE_XB_PIN           0
+#define QUADRATURE_XB_PIN           2
 #endif
 
 #ifndef QUADRATURE_YA_PIN
@@ -93,7 +93,7 @@
 #endif
 
 #ifndef QUADRATURE_YB_PIN
-#define QUADRATURE_YB_PIN           1 
+#define QUADRATURE_YB_PIN           5 
 #endif
 
 #endif // __CH554_QUADRATURE_CFG_H__
