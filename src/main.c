@@ -26,7 +26,7 @@
 
 #define LED_FLASH_RATE_MS           300
 #define USB_TRANSFER_RATE_MS        8
-#define BUZZER_ACTIVE_DURATION_MS   10
+#define BUZZER_ACTIVE_DURATION_MS   2
 
 __code uint8_t SetupGetDevDescr[] = { USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_DEVICE, 0x00, 0x00, sizeof(USB_DEV_DESCR), 0x00 };
 __code uint8_t SetupGetCfgDescr[] = { USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_CONFIG, 0x00, 0x00, 0x04, 0x00 };

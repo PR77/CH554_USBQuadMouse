@@ -29,4 +29,9 @@
 #define BUZZER_OUTPUT_PIN       4
 #endif
 
+#ifndef BUZZER_FREQUENCY_HZ
+#define BUZZER_FREQUENCY_HZ     4000
+#endif
+
+
 #endif // __CH554_BUZZER_CFG_H__

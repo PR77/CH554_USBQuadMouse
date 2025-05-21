@@ -12,27 +12,28 @@
 #include "buzzer.h"
 #include "buzzer_cfg.h"
 
+// References - 2020 by Stefan Wagner 
+// Project Files (EasyEDA): https://easyeda.com/wagiminator
+// Project Files (Github):  https://github.com/wagiminator
+// License: http://creativecommons.org/licenses/by-sa/3.0/
+
+// ===================================================================================
+// Set global PWM frequency (in Hertz, range: F_CPU/65536 - F_CPU/256)
+// ===================================================================================
+#define PWM_set_freq(FREQ) \
+    (((FREQ) >= F_CPU / 256) ? (PWM_CK_SE = 0)              : \
+    (((F_CPU / 256 / (FREQ) - 1) > 255) ? (PWM_CK_SE = 255) : \
+    (PWM_CK_SE = (uint8_t)(F_CPU / 256 / (FREQ) - 1))         \
+))
+
 SBIT(BUZZER_OUTPUT, BUZZER_OUTPUT_PORT, BUZZER_OUTPUT_PIN);
 
 void buzzer_initialise(void) {
-    uint32_t pwmClockTarget = PWM_CK_SE_TARGET(1000);
-    uint32_t divisorFactor = 1;
 
     BUZZER_OUTPUT_MOD_OC = BUZZER_OUTPUT_MOD_OC & ~(1 << BUZZER_OUTPUT_PIN);
     BUZZER_OUTPUT_DIR_PU = BUZZER_OUTPUT_DIR_PU | (1 << BUZZER_OUTPUT_PIN);
 
-    // Try to find the closest factor (of 2) to match the target PWM frequency.
-    // Note: Details in datasheet are pretty sketchy...
-    // https://onlinegdb.com/ujRetZZnx
-    for (uint8_t i = 0, j = 0; i < UINT8_MAX; i++) {
-        if (pwmClockTarget > divisorFactor) {
-            divisorFactor <<= 1;
-            j++;
-        } else {
-            PWM_CK_SE = j;
-            break;
-        }
-    }
+    PWM_set_freq(BUZZER_FREQUENCY_HZ);
 
     PWM_CTRL = PWM_CTRL & ~bPWM2_OUT_EN;
     PWM_CTRL = PWM_CTRL | bPWM_CLR_ALL;

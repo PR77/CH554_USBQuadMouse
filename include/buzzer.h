@@ -14,8 +14,6 @@
 #include "ch554.h"
 #include "buzzer_cfg.h"
 
-#define PWM_CK_SE_TARGET(x) (uint32_t)(FREQ_SYS / x)
-
 void buzzer_initialise(void);
 inline void buzzer_startBuzzer(void);
 inline void buzzer_stopBuzzer(void);
