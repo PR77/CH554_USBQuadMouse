@@ -40,7 +40,7 @@ void system_CfgFsys(void)  {
 #elif FREQ_SYS == 750000
     CLOCK_CFG = CLOCK_CFG & ~MASK_SYS_CK_SEL | 0x01; // 750KHz
 #elif FREQ_SYS == 187500
-    CLOCK_CFG = CLOCK_CFG & ~MASK_SYS_CK_SEL | 0x00; // 187.5MHz
+    CLOCK_CFG = CLOCK_CFG & ~MASK_SYS_CK_SEL | 0x00; // 187.5KHz
 #else
 #warning FREQ_SYS invalid or not set
 #endif

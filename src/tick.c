@@ -21,12 +21,13 @@ void tick_timer0Interrupt(void) __interrupt(INT_NO_TMR0) {
     _1msTimerCount++;
 }
 
-inline void tick_initialiseTimer0(void) {
+void tick_initialiseTimer0(void) {
 
-    TMOD = TMOD & ~bT0_CT;          // timer in timing mode
     TMOD = TMOD | bT0_M0;           // timing, not counting, mode 1 (counts to 0xFFFF - TLTH)
     T2MOD = T2MOD & ~bTMR_CLK;      // Fsys clock select
-    T2MOD = T2MOD & ~bT0_CLK;       // divide by 12
+    T2MOD = T2MOD & ~bT0_CLK;       // T0 CLK is Fsys divide by 12
+    TMOD = TMOD & ~bT0_CT;          // timer in timing mode
+    
     TL0 = TIMER_RELOAD_VALUE_MS_TL0(1);  
     TH0 = TIMER_RELOAD_VALUE_MS_TH0(1);
 }

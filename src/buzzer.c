@@ -35,6 +35,8 @@ void buzzer_initialise(void) {
     }
 
     PWM_CTRL = PWM_CTRL & ~bPWM2_OUT_EN;
+    PWM_CTRL = PWM_CTRL | bPWM_CLR_ALL;
+    PWM_CTRL = PWM_CTRL & ~bPWM_CLR_ALL;
     PWM_DATA2 = 0x7F;
 }
 
@@ -47,14 +49,5 @@ inline void buzzer_stopBuzzer(void) {
 }
 
 inline void buzzer_toggleBuzzer(void) {
-    PWM_CTRL ^= PWM_CTRL | bPWM2_OUT_EN;
-}
-
-void buzzer_updateBuzzers(uint8_t counts) {
-
-    if (counts) {
-        BUZZER_OUTPUT = 1;
-    }
-    
-    BUZZER_OUTPUT = 0;
+    PWM_CTRL = PWM_CTRL ^ bPWM2_OUT_EN;
 }

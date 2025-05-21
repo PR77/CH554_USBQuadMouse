@@ -20,6 +20,5 @@ void buzzer_initialise(void);
 inline void buzzer_startBuzzer(void);
 inline void buzzer_stopBuzzer(void);
 inline void buzzer_toggleBuzzer(void);
-void buzzer_updateBuzzers(uint8_t counts);
 
 #endif // __CH554_BUZZER_H__

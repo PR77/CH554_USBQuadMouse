@@ -26,6 +26,7 @@
 
 #define LED_FLASH_RATE_MS           300
 #define USB_TRANSFER_RATE_MS        8
+#define BUZZER_ACTIVE_DURATION_MS   10
 
 __code uint8_t SetupGetDevDescr[] = { USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_DEVICE, 0x00, 0x00, sizeof(USB_DEV_DESCR), 0x00 };
 __code uint8_t SetupGetCfgDescr[] = { USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_CONFIG, 0x00, 0x00, 0x04, 0x00 };
@@ -90,6 +91,9 @@ void main(void) {
     serial_printString("\x1b[2J\x1b[HMOUSE <> QUADRATURE ENCODER RUNNING\n\r");
 
     quadrature_startEncoding();
+    buzzer_startBuzzer();
+    system_mDelaymS(BUZZER_ACTIVE_DURATION_MS);
+    buzzer_stopBuzzer();
 
     while (1) {
 
@@ -107,7 +111,6 @@ void main(void) {
             previousCountLEDFlash += LED_FLASH_RATE_MS;
 
             heartbeat_toggleState();
-            buzzer_toggleBuzzer();
         }
 
         if (UIF_DETECT) {
@@ -203,7 +206,6 @@ void main(void) {
 
                             ssd1306_setCursor(11, 3);
                             if ((uint8_t)(RxBuffer[0]) & 0x04) {
-                                buzzer_updateBuzzers(1);
                                 ssd1306_printString("M");
                             } else ssd1306_printString("-");
                             
