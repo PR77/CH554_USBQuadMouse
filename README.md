@@ -8,9 +8,10 @@ This design has not been compliance tested and will not be. It may cause persona
 This project allows you to use a USB mouse on an Amiga computer. It essentially converts a USB mouse to generate a quadrature signal stream. There are many variants of such a project available, either using this micro controller or others, however I'm using this project as an opportunity to learn more about the WCH55x micro controller.
 
 # Appearance Breadboard Version
-TBC
+I forgot to take a picture of the mess of wires breadboard version, so here is a picture on some perf-board instead.
+![Perfboard](/Images/prototypeBoard.jpg)
 
-# Appearance PCB Version
+# Appearance Final PCB Version
 TBC
 
 # Credits
