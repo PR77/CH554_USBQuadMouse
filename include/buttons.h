@@ -14,7 +14,7 @@
 #include "ch554.h"
 #include "buttons_cfg.h"
 
-void buttons_initialise(void);
+void buttons_initialise(uint8_t invertSignal);
 void buttons_leftButton(uint8_t buttonState);
 void buttons_rightButton(uint8_t buttonState);
 

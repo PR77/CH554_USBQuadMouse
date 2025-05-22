@@ -25,7 +25,7 @@
 #define CONSOLE_DEBUG_ENABLED
 
 #define LED_FLASH_RATE_MS           300
-#define USB_TRANSFER_RATE_MS        8
+#define USB_TRANSFER_RATE_MS        2
 #define BUZZER_ACTIVE_DURATION_MS   2
 
 __code uint8_t SetupGetDevDescr[] = { USB_REQ_TYP_IN, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_DEVICE, 0x00, 0x00, sizeof(USB_DEV_DESCR), 0x00 };
@@ -79,8 +79,8 @@ void main(void) {
     InitUSB_Host();
 
     // Setup buttons and buzzer
-    buttons_initialise();
-    buzzer_initialise(),
+    buttons_initialise(1);
+    buzzer_initialise();
 
     tick_startTimer0();
     system_enableGlobalInterupts();
@@ -228,9 +228,9 @@ void main(void) {
                                 quadrature_updateCounts(QUADRATURE_Y_CHANNEL, previousYCounts);
                             }
 
-                            ssd1306_printHexByte((uint8_t)(RxBuffer[1]));
+                            ssd1306_printHexByte(quadrature_getCounts(QUADRATURE_X_CHANNEL));
                             ssd1306_printString(", ");
-                            ssd1306_printHexByte((uint8_t)(RxBuffer[2]));
+                            ssd1306_printHexByte(quadrature_getCounts(QUADRATURE_Y_CHANNEL));
                         }
                     } else if (usbStatus != (USB_PID_NAK | ERR_USB_TRANSFER)) {
                         ssd1306_printString("MOUSE ERROR DETECTED ");

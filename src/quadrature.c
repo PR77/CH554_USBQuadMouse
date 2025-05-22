@@ -124,13 +124,26 @@ void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
 
     if (quadratureOutputs[channelIndex].directionChange == 1) {
         quadratureOutputs[channelIndex].directionChange = 0;
-        quadratureOutputs[channelIndex].sequenceCounts = 0;
+        // Depending on specific needs and application, it may be required to clear the
+        // sequence counts before returning.
+        // quadratureOutputs[channelIndex].sequenceCounts = 0;
         return;    
     }
 
     quadratureOutputs[channelIndex].sequenceCounts += abs(counts);
 
     quadrature_startEncoding();
+}
+
+uint8_t quadrature_getCounts(uint8_t channelIndex) {
+    
+    uint8_t channelSequenceCount = 0;
+
+    if (channelIndex < QUADRATURE_CHANNELS) {
+        channelSequenceCount = quadratureOutputs[channelIndex].sequenceCounts;
+    }
+
+    return (channelSequenceCount);
 }
 
 static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
@@ -164,11 +177,11 @@ static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
     }
 
     if (currentChannelIndex == QUADRATURE_X_CHANNEL) {
-        QUADRATURE_XA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
-        QUADRATURE_XB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
+        QUADRATURE_XB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
+        QUADRATURE_XA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
     } else if (currentChannelIndex == QUADRATURE_Y_CHANNEL) {
-        QUADRATURE_YA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
-        QUADRATURE_YB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
+        QUADRATURE_YB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
+        QUADRATURE_YA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
     } else {
         return;
     }

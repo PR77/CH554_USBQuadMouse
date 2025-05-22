@@ -49,6 +49,7 @@ void quadrature_initialise(encodingRate_e encodingRate);
 inline void quadrature_startEncoding(void);
 inline void quadrature_stopEncoding(void);
 void quadrature_updateCounts(uint8_t channelIndex, int8_t counts);
+uint8_t quadrature_getCounts(uint8_t channelIndex);
 static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput);
 
 #endif // __CH554_QUADRATURE_H__
