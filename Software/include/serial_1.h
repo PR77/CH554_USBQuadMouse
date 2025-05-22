@@ -37,7 +37,7 @@
 #endif  
 
 void serial_UART1Interrupt(void) __interrupt(INT_NO_UART1);
-inline void serial_initialiseSerial1(uint32_t baudRate, uint8_t alternativePins);
+void serial_initialiseSerial1(uint32_t baudRate, uint8_t alternativePins);
 inline void serial_disableSerial1Interrupt(void);
 inline void serial_enableSerial1Interrupt(void);
 

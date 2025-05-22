@@ -71,7 +71,7 @@ void serial_UART1Interrupt(void) __interrupt(INT_NO_UART1) {
     }
 }
 
-inline void serial_initialiseSerial1(uint32_t baudRate, uint8_t alternativePins) {
+void serial_initialiseSerial1(uint32_t baudRate, uint8_t alternativePins) {
     U1SM0 = 0;
     U1SMOD = 1;
     U1REN = 1;

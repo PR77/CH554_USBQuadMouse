@@ -25,7 +25,7 @@ void serial_UART0Interrupt(void) __interrupt(INT_NO_UART0) {
     }
 }
 
-inline void serial_initialiseSerial0(uint32_t baudRate, uint8_t alternativePins, uint8_t enableInterrupt) {
+void serial_initialiseSerial0(uint32_t baudRate, uint8_t alternativePins, uint8_t enableInterrupt) {
     SM0 = 0;
     SM1 = 1;
     SM2 = 0;                        // Serial port 0 usage mode 1

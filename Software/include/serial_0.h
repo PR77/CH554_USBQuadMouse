@@ -15,7 +15,7 @@
 #include "serial_cfg.h"
 
 void serial_UART0Interrupt(void) __interrupt(INT_NO_UART0);
-inline void serial_initialiseSerial0(uint32_t baudRate, uint8_t alternativePins, uint8_t enableInterrupt);
+void serial_initialiseSerial0(uint32_t baudRate, uint8_t alternativePins, uint8_t enableInterrupt);
 inline void serial_disableSerial0Interrupt(void);
 inline void serial_enableSerial0Interrupt(void);
 uint8_t serial_getByteSerial0(void);
