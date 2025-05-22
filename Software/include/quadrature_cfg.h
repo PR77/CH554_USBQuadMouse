@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include "ch554.h"
 
+#undef QUADRATURE_COUNT_RESET_ON_DIRECTION_CHANGE
+
 #ifndef QUADRATURE_CHANNELS
 #define QUADRATURE_CHANNELS         2
 #endif

@@ -126,7 +126,9 @@ void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
         quadratureOutputs[channelIndex].directionChange = 0;
         // Depending on specific needs and application, it may be required to clear the
         // sequence counts before returning.
-        // quadratureOutputs[channelIndex].sequenceCounts = 0;
+#if defined(QUADRATURE_COUNT_RESET_ON_DIRECTION_CHANGE)
+        quadratureOutputs[channelIndex].sequenceCounts = 0;
+#endif
         return;    
     }
 
