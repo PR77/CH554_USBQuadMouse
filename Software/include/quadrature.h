@@ -40,6 +40,7 @@ typedef enum {
     encodingRate4000Hz = 4000,
     encodingRate8000Hz = 8000,
     encodingRate12000Hz = 12000,
+    encodingRate14000Hz = 14000,
     encodingRateMaximum
 
 } encodingRate_e;

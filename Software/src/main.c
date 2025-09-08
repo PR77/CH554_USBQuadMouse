@@ -62,7 +62,7 @@ void main(void) {
     tick_enableTimer0Interrupt();
 
     // Setup quadrature encoder
-    quadrature_initialise(encodingRate12000Hz);
+    quadrature_initialise(encodingRate2000Hz);
 
     // Setup heartbeat LED
     heartbeat_initialise();
