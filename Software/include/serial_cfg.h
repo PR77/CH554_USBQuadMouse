@@ -4,7 +4,7 @@
 * License       : MIT
 * Version       : V1.0
 * Date          : 2024/12/17
-* Description   : 8051 UART CONFIGURATION
+* Description   : 8051 UART Configuration
 *******************************************************************************/
 
 #ifndef __CH554_SERIAL_CFG_H__

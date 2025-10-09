@@ -4,7 +4,7 @@
 * License       : MIT
 * Version       : V1.0
 * Date          : 2025/02/28
-* Description   : QUADRATURE ENCODER
+* Description   : Quadrature Encoder
 *******************************************************************************/
 
 #ifndef __CH554_QUADRATURE_H__

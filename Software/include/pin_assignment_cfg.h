@@ -1,10 +1,10 @@
 /********************************** (C) COPYRIGHT *******************************
-* File Name     : QUADRATURE_CFG.H
+* File Name     : PIN_ASSIGNMENT_CFG.H
 * Author        : Paul Raspa (PR77)
 * License       : MIT
 * Version       : V1.0
 * Date          : 2025/05/19
-* Description   : PIN ASSIGNMENTS
+* Description   : Pin Assignments
 *******************************************************************************/
 
 #ifndef __CH554_PIN_ASSIGNMENT_CFG_H__
@@ -32,11 +32,19 @@
 #endif
 
 #ifndef HEARTBEAT_ASSIGNED_PIN
-#define HEARTBEAT_ASSIGNED_PIN              1.4
+#if defined(PCB_LAYOUT)
+    #define HEARTBEAT_ASSIGNED_PIN          1.5
+    #else
+    #define HEARTBEAT_ASSIGNED_PIN          1.4
+#endif
 #endif
 
 #ifndef QUADRATURE_YB_ASSIGNED_PIN
-#define QUADRATURE_YB_ASSIGNED_PIN          1.5 
+#if defined(PCB_LAYOUT)
+    #define QUADRATURE_YB_ASSIGNED_PIN      1.4 
+    #else
+    #define QUADRATURE_YB_ASSIGNED_PIN      1.5 
+#endif
 #endif
 
 // Port 3

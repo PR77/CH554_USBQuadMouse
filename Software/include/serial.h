@@ -4,7 +4,7 @@
 * License       : MIT
 * Version       : V1.0
 * Date          : 2025/02/05
-* Description   : 8051 UART COMMON
+* Description   : 8051 UART Common
 *******************************************************************************/
 
 #ifndef __CH554_SERIAL_H__

@@ -4,7 +4,7 @@
 * License       : MIT
 * Version       : V1.0
 * Date          : 2025/02/06
-* Description   : 8051 UART COMMON
+* Description   : 8051 UART Common
 *******************************************************************************/
 
 #include <stdint.h>

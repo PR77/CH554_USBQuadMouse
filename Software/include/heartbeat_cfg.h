@@ -26,7 +26,11 @@
 #endif
 
 #ifndef HEARTBEAT_PIN
-#define HEARTBEAT_PIN           4
+#if defined(PCB_LAYOUT)
+    #define HEARTBEAT_PIN       5
+    #else
+    #define HEARTBEAT_PIN       4
+#endif
 #endif
 
 #endif // __CH554_HEARTBEAT_CFG_H__

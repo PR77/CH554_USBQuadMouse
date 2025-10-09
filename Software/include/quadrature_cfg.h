@@ -4,7 +4,7 @@
 * License       : MIT
 * Version       : V1.0
 * Date          : 2025/02/28
-* Description   : QUADRATURE ENCODER
+* Description   : Quadrature Encoder
 *******************************************************************************/
 
 #ifndef __CH554_QUADRATURE_CFG_H__
@@ -95,7 +95,11 @@
 #endif
 
 #ifndef QUADRATURE_YB_PIN
-#define QUADRATURE_YB_PIN           5 
+#if defined(PCB_LAYOUT)
+    #define QUADRATURE_YB_PIN       4
+    #else
+    #define QUADRATURE_YB_PIN       5
+#endif
 #endif
 
 #endif // __CH554_QUADRATURE_CFG_H__
