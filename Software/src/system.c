@@ -63,7 +63,7 @@ inline void system_disableGlobalInterupts(void) {
 }
 
 /*******************************************************************************
-* Function Name  : system_mDelayus(UNIT16 n)
+* Function Name  : system_mDelayuS(UNIT16 n)
 * Description    : us delay function
 * Input          : UNIT16 n
 * Output         : None

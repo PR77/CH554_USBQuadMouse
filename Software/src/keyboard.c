@@ -11,6 +11,7 @@
 #include "ch554.h"
 #include "keyboard.h"
 #include "keyboard_cfg.h"
+#include "system.h"
 
 SBIT(KBCLOCK, KBCLOCK_PORT, KBCLOCK_PIN);
 SBIT(KBDATA, KBDATA_PORT, KBDATA_PIN);
@@ -28,6 +29,7 @@ void keyboard_initialise(void) {
 
     KBRESET_MOD_OC = KBRESET_MOD_OC & ~(1 << KBRESET_PIN);
     KBRESET_DIR_PU = KBRESET_DIR_PU | (1 << KBRESET_PIN);
+    KBRESET = 1;
 
     KBSTATUS_MOD_OC = KBSTATUS_MOD_OC | (1 << KBSTATUS_PIN);
     KBSTATUS_DIR_PU = KBSTATUS_DIR_PU | (1 << KBSTATUS_PIN);
@@ -36,14 +38,45 @@ void keyboard_initialise(void) {
     KBINUSE_DIR_PU = KBINUSE_DIR_PU | (1 << KBINUSE_PIN);
 }
 
-void keyboard_sendKey(uint8_t keyCode) {
+void keyboard_sendKey(uint8_t keyCode, uint8_t pressedReleased) {
+    //         _____   ___   ___   ___   ___   ___   ___   ___   _________
+    // KBCLOCK      \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
+    //         ___________________________________________________________
+    // KBDATA     \_____X_____X_____X_____X_____X_____X_____X_____/
+    //           (6)   (5)   (4)   (3)   (2)   (1)   (0)   (7)
+    //
+    //          First                                     Last
+    //          sent                                      sent
 
-    (void)keyCode;
+    // Code taken from repo here: https://github.com/PR77/PS2_Keyboard_Adapter
+
+    uint8_t z = 0x80; 
+    uint8_t keyCodeToSend = (keyCode << 1);
+
+    keyCodeToSend |= (pressedReleased) ? 0x00 : 0x01; 
+
+    KBDATA = 1;
+    KBCLOCK = 1;
+
+    for (uint8_t i = 0; i < 8; i++) {
+        KBDATA = !(keyCodeToSend & z);
+        
+        system_mDelayuS(20);
+        KBCLOCK = 0;
+        system_mDelayuS(20);
+        KBCLOCK = 1;
+
+        z = z >> 1 ;
+    }
+
+    system_mDelayuS(200);
 }
 
-void keyboard_assertReset(uint8_t resetState) {
+void keyboard_assertReset(void) {
 
-    (void)resetState;
+    KBRESET = 0;
+    system_mDelayuS(200);
+    KBRESET = 1;
 }
 
 keyboardStatus_e keyboard_getStatus(void) {

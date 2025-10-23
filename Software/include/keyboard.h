@@ -25,8 +25,8 @@ typedef enum {
 } keyboardInUse_e;
 
 void keyboard_initialise(void);
-void keyboard_sendKey(uint8_t keyCode);
-void keyboard_assertReset(uint8_t resetState);
+void keyboard_sendKey(uint8_t keyCode, uint8_t pressedReleased);
+void keyboard_assertReset(void);
 keyboardStatus_e keyboard_getStatus(void);
 keyboardInUse_e keyboard_getInUse(void);
 
