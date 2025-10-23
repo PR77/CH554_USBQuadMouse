@@ -35,11 +35,19 @@
 #endif
 
 #ifndef I2C_SDAT_PIN
-#define I2C_SDAT_PIN        1
+#if defined(PCB_LAYOUT)
+    #define I2C_SDAT_PIN    0
+    #else
+    #define I2C_SDAT_PIN    1
+#endif
 #endif
 
 #ifndef I2C_SCLK_PIN
-#define I2C_SCLK_PIN        0
+#if defined(PCB_LAYOUT)
+    #define I2C_SCLK_PIN    1
+    #else
+    #define I2C_SCLK_PIN    0
+#endif
 #endif
 
 #endif // __CH554_I2C_CFG_H__

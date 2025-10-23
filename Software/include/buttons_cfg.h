@@ -17,10 +17,6 @@
 #define LEFT_BUTTON_PORT        0x90
 #endif
 
-#ifndef RIGHT_BUTTON_PORT
-#define RIGHT_BUTTON_PORT       0x90
-#endif
-
 #ifndef LEFT_BUTTON_MOD_OC
 #define LEFT_BUTTON_MOD_OC      P1_MOD_OC
 #endif
@@ -29,16 +25,20 @@
 #define LEFT_BUTTON_DIR_PU      P1_DIR_PU
 #endif
 
+#ifndef LEFT_BUTTON_PIN
+#define LEFT_BUTTON_PIN         3
+#endif
+
+#ifndef RIGHT_BUTTON_PORT
+#define RIGHT_BUTTON_PORT       0x90
+#endif
+
 #ifndef RIGHT_BUTTON_MOD_OC
 #define RIGHT_BUTTON_MOD_OC     P1_MOD_OC
 #endif
 
 #ifndef RIGHT_BUTTON_DIR_PU
 #define RIGHT_BUTTON_DIR_PU     P1_DIR_PU
-#endif
-
-#ifndef LEFT_BUTTON_PIN
-#define LEFT_BUTTON_PIN         3
 #endif
 
 #ifndef RIGHT_BUTTON_PIN

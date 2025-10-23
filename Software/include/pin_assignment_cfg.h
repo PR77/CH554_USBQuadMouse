@@ -49,12 +49,20 @@
 
 // Port 3
 
-#ifndef I2C_SCLK_ASSIGNED_PIN
-#define I2C_SCLK_ASSIGNED_PIN               3.0
+#ifndef I2C_SDAT_PIN
+#if defined(PCB_LAYOUT)
+    #define I2C_SDAT_ASSIGNED_PIN           3.0
+    #else
+    #define I2C_SDAT_ASSIGNED_PIN           3.1
+#endif
 #endif
 
-#ifndef I2C_SDAT_ASSIGNED_PIN
-#define I2C_SDAT_ASSIGNED_PIN               3.1
+#ifndef I2C_SCLK_PIN
+#if defined(PCB_LAYOUT)
+    #define I2C_SCLK_ASSIGNED_PIN           3.1
+    #else
+    #define I2C_SCLK_ASSIGNED_PIN           3.0
+#endif
 #endif
 
 #ifndef QUADRATURE_XB_ASSIGNED_PIN
