@@ -14,6 +14,7 @@ I forgot to take a picture of the mess of wires breadboard version, so here is a
 
 # Appearance Final PCB Version
 PCB version has been routed and manufactured. Here is the usual 3D artwork of the design.
+
 ![PCB](/Images/USBQuadMousePCB.png)
 
 OLED is also supported. In addition to emulating a QUADRATURE Mouse, I also added a header to allow the board to be used to connect a USB Keyboard to the Amiga. Of course, only USB device can be used at a time. Software for the keyboard support is still work-in-progress.
