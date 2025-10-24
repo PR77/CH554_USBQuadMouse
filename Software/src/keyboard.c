@@ -11,6 +11,7 @@
 #include "ch554.h"
 #include "keyboard.h"
 #include "keyboard_cfg.h"
+#include "keyboard_layout.h"
 #include "system.h"
 
 SBIT(KBCLOCK, KBCLOCK_PORT, KBCLOCK_PIN);
@@ -18,6 +19,9 @@ SBIT(KBDATA, KBDATA_PORT, KBDATA_PIN);
 SBIT(KBRESET, KBRESET_PORT, KBRESET_PIN);
 SBIT(KBSTATUS, KBSTATUS_PORT, KBSTATUS_PIN);
 SBIT(KBINUSE, KBINUSE_PORT, KBINUSE_PIN);
+
+static const uint8_t keycode2ascii[128][3] =  {DE_KEYCODE_TO_ASCII};
+// THIS IS ASCII - NEEDS TO BE UPDATED TO AMIGA KEYCODES
 
 void keyboard_initialise(void) {
 
