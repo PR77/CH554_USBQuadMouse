@@ -25,7 +25,7 @@
 #define ROOT_DEV_CONNECTED   1
 #define ROOT_DEV_FAILED      2
 #define ROOT_DEV_SUCCESS     3
-#define DEV_TYPE_KEYBOARD    (USB_DEV_CLASS_HID | 0x20)
+#define DEV_TYPE_KEYBOARD    (USB_DEV_CLASS_HID | 0x00)
 #define DEV_TYPE_MOUSE       (USB_DEV_CLASS_HID | 0x30)
 #define DEF_AOA_DEVICE       0xF0
 

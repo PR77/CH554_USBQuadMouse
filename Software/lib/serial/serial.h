@@ -15,6 +15,8 @@
 #include "serial_0.h"
 #include "serial_1.h"
 
+void serial_printCharacter(char character);
+uint16_t serial_getCharacter(uint32_t timeout);
 void serial_printString(char* string);
 void serial_printHexByte(uint8_t value);
 void serial_printHexWord(uint16_t value);

@@ -14,6 +14,7 @@
 #include "system.h"
 #include "tick.h"
 #include "quadrature.h"
+#include "keyboard.h"
 #include "buttons.h"
 #include "buzzer.h"
 #include "i2c.h"
@@ -39,13 +40,30 @@ __code uint8_t SetupGetHIDDevReport[] = { 0x81, USB_GET_DESCRIPTOR, 0x00, USB_DE
 __code uint8_t SetupGetHubDescr[] = { HUB_GET_HUB_DESCRIPTOR, HUB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_HUB, 0x00, 0x00, sizeof(USB_HUB_DESCR), 0x00 };
 
 __xdata uint8_t UsbDevEndp0Size;                                                      
-__xdata __at (0x0000) uint8_t RxBuffer[ MAX_PACKET_SIZE ];  // IN, must even address
-__xdata __at (0x0040) uint8_t TxBuffer[ MAX_PACKET_SIZE ];  // OUT, must even address
+__xdata __at (0x0000) uint8_t RxBuffer[MAX_PACKET_SIZE];  // IN, must even address
+__xdata __at (0x0040) uint8_t TxBuffer[MAX_PACKET_SIZE];  // OUT, must even address
 
 uint8_t Set_Port = 0;
 __xdata _RootHubDev ThisUsbDev;                             // ROOT
 __xdata _DevOnHubPort DevOnHubPort[HUB_MAX_PORTS];          // Assumption: no more than 1 external HUB, each external HUB does not exceed HUB_MAX_PORTS ports (don’t care if there are more)
 __bit FoundNewDev;
+
+typedef struct {
+
+    uint8_t buttonStatus;
+    int8_t xAxisMovement;
+    int8_t yAxisMovement;
+    int8_t wheelMovement;
+
+} devTypeMousePayload_s;
+
+typedef struct {
+
+    uint8_t modifierKeys;
+    uint8_t reserved;
+    uint8_t keyCodes[6];
+    
+} devTypeKeyboardPayload_s;
 
 void main(void) {
     static uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;
@@ -61,8 +79,9 @@ void main(void) {
     tick_initialiseTimer0();
     tick_enableTimer0Interrupt();
 
-    // Setup quadrature encoder
+    // Setup quadrature encoder and mouse button emulation
     quadrature_initialise(encodingRate2000Hz);
+    buttons_initialise(1);
 
     // Setup heartbeat LED
     heartbeat_initialise();
@@ -78,17 +97,17 @@ void main(void) {
     // Setup and initialise USB host
     InitUSB_Host();
 
-    // Setup buttons and buzzer
-    buttons_initialise(1);
+    // Setup buzzer
     buzzer_initialise();
 
+    // Start timer tick and enable global interrupts
     tick_startTimer0();
     system_enableGlobalInterupts();
 
     // Application code starts here ...
     ssd1306_setCursor(0, 0);
-    ssd1306_printString("MOUSE <> QUAD RUNNING");
-    serial_printString("\x1b[2J\x1b[HMOUSE <> QUADRATURE ENCODER RUNNING\n\r");
+    ssd1306_printString("USB <-> AMIGA X-LATER");
+    serial_printString("\x1b[2J\x1b[HUSB MOUSE + KEYBOARD <-> AMIGA X-LATER RUNNING...\n\r");
 
     quadrature_startEncoding();
     buzzer_startBuzzer();
@@ -97,15 +116,21 @@ void main(void) {
 
     while (1) {
 
-        /*
-        TO DO: Better debug the RX handling. It seems _if_ the RX buffer is quickly
-        filled, the timeout loop may not break out.
-        */
-
 #if defined(CONSOLE_DEBUG_ENABLED)
-        if (serial_isDataAvailable() == RECEIVE_DATA_AVAIL)
-            CONSOLE_PORT_PUTCHR((uint8_t)serial_getByteSerial1(0));
+        uint16_t characterToEcho = serial_getCharacter(0);
+
+        if ((characterToEcho != RECEIVE_TIMEOUT) && (characterToEcho != RECEIVE_NO_DATA_AVAIL)) {
+            serial_printCharacter((char)characterToEcho);    
+        }
 #endif // CONSOLE_DEBUG_ENABLED
+
+        if (bootloader_checkBootloaderRequest()) {
+            buzzer_stopBuzzer();
+            ssd1306_clearScreen();
+            ssd1306_setCursor(0, 0);
+            ssd1306_printString("---- BOOT LOADER ----");
+            bootloader_enter();
+        }
 
         if ((tick_get1msTimerCount() - previousCountLEDFlash) > LED_FLASH_RATE_MS) {
             previousCountLEDFlash += LED_FLASH_RATE_MS;
@@ -148,13 +173,66 @@ void main(void) {
                 ssd1306_printString("ENUMERATION ERROR  ");
                 ssd1306_printHexByte(usbStatus);
             }
+
+            // TODO: Put logic here to initialise / deinitialise Mouse or Keyboard depending
+            // on what device has been inserted or removed.
         }
 
         if ((tick_get1msTimerCount() - previousCountUSBTransfer) > USB_TRANSFER_RATE_MS) {
             previousCountUSBTransfer += USB_TRANSFER_RATE_MS;
 
-            usbLocation = SearchTypeDevice(DEV_TYPE_MOUSE);
+            usbLocation = SearchTypeDevice(DEV_TYPE_KEYBOARD);
+            if (usbLocation != 0xFFFF) {                                     // found a keyboard
+                ssd1306_setCursor(0, 2);
+                ssd1306_printString("ENUMERATION LOC ");
+                ssd1306_printHexWord(usbLocation);
+            
+                ssd1306_setCursor(0, 3);
+                SelectHubPort(usbLocation);                                 // select to operate designated ROOT-HUB port, set current USB speed and USB address of operated device
+                usbLocation = usbLocation >> 8;                             // CH554 has only one USB, only the lower eight bits are required
 
+                if (usbLocation) {
+                    endp = DevOnHubPort[usbLocation-1].GpVar[0];            // address of interrupt endpoint, bit 7 is used for synchronization flag bit
+                } else {
+                    endp = ThisUsbDev.GpVar[0];
+                }
+
+                if (endp & USB_ENDP_ADDR_MASK) {                             // endpoint valid
+                    // CH554 transmit transaction, get data, NAK does not retry
+                    usbStatus = USBHostTransact(USB_PID_IN << 4 | endp & 0x7F, endp & 0x80 ? bUH_R_TOG | bUH_T_TOG : 0, 0);
+                    if (usbStatus == ERR_SUCCESS) {
+                        endp ^= 0x80;                                       // flip sync flag
+
+                        if (usbLocation) {
+                            DevOnHubPort[usbLocation-1].GpVar[0] = endp;    // save synchronization flag
+                        } else { 
+                            ThisUsbDev.GpVar[0] = endp;
+                        }
+                
+                        len = USB_RX_LEN;                                   // received data length
+                        if ((len) && (len <= DEFAULT_ENDP0_SIZE)) {
+                            const keymapLayout_s * receivedKey;
+                            for (uint8_t i = 0; i < sizeof(devTypeKeyboardPayload_s); i++) {
+                                ssd1306_printHexByte((uint8_t)(RxBuffer[i]));
+                            }
+
+                            ssd1306_printString(", ");
+
+                            receivedKey = keyboard_translateKey(RxBuffer[2]);
+                            if (receivedKey->rawKeyCode != 0) {
+                                ssd1306_printCharacter(receivedKey->asciiCode);
+                            } else ssd1306_printCharacter(' ');
+
+                        }
+                    } else if (usbStatus != (USB_PID_NAK | ERR_USB_TRANSFER)) {
+                        ssd1306_printString("K-BRD ERROR DETECTED ");
+                    }
+                } else {
+                    ssd1306_printString("NO INTRPT END POINT  ");
+                }
+            }
+
+            usbLocation = SearchTypeDevice(DEV_TYPE_MOUSE);
             if (usbLocation != 0xFFFF) {                                     // found a mouse (how to deal with two mice?)
                 ssd1306_setCursor(0, 2);
                 ssd1306_printString("ENUMERATION LOC ");
@@ -183,14 +261,10 @@ void main(void) {
                         }
                 
                         len = USB_RX_LEN;                                   // received data length
-                        if (len) {
+                        if ((len) && (len <= DEFAULT_ENDP0_SIZE)) {
                             static int8_t previousXCounts = 0, previousYCounts = 0;
 
-                            for (uint8_t i = 0; i < 4; i++) {
-                                // Byte 0 - Buttons
-                                // Byte 1 - X
-                                // Byte 2 - Y
-                                // Bzte 3 - Wheel
+                            for (uint8_t i = 0; i < sizeof(devTypeMousePayload_s); i++) {
                                 ssd1306_printHexByte((uint8_t)(RxBuffer[i]));
                             }
                             ssd1306_printString(", ");
@@ -239,14 +313,6 @@ void main(void) {
                     ssd1306_printString("NO INTRPT END POINT  ");
                 }
             }
-        }
-
-        if (bootloader_checkBootloaderRequest()) {
-            buzzer_stopBuzzer();
-            ssd1306_clearScreen();
-            ssd1306_setCursor(0, 0);
-            ssd1306_printString("---- BOOT LOADER ----");
-            bootloader_enter();
         }
     }
 } 

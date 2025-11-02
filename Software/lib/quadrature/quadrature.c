@@ -84,6 +84,12 @@ void quadrature_initialise(encodingRate_e encodingRate) {
     // (6). Inquire TF2 or Timer2 interrupt to obtain the current timer/counter state.
 }
 
+void quadrature_deinitialise(void) {
+    
+    quadrature_stopEncoding();
+    memset(&quadratureOutputs, 0, (sizeof(quadratureOutput_s) * QUADRATURE_CHANNELS));
+}
+
 inline void quadrature_startEncoding(void) {
 
     if (ET2 == 0) {

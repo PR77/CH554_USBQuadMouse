@@ -26,7 +26,7 @@
 #endif
 
 #ifndef CONSOLE_PORT_GETCHR
-#define CONSOLE_PORT_GETCHR()   serial_getByteSerial1()
+#define CONSOLE_PORT_GETCHR(x)   serial_getByteSerial1(x)
 #endif
 
 #endif // __CH554_SERIAL_CFG_H__

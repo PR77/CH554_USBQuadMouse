@@ -22,6 +22,14 @@ static const uint8_t hexTable[] = {
     'C', 'D', 'E', 'F'
 };
 
+void serial_printCharacter(char character) {
+    CONSOLE_PORT_PUTCHR(character);
+}
+
+uint16_t serial_getCharacter(uint32_t timeout) {
+    return (CONSOLE_PORT_GETCHR(timeout));
+}
+
 void serial_printString(char* string) {
 
     if (!string) {

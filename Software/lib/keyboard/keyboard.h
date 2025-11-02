@@ -14,6 +14,12 @@
 #include "ch554.h"
 #include "keyboard_cfg.h"
 
+typedef struct {
+    uint8_t rawKeyCode;
+    uint8_t amigaKeyCode;
+    char asciiCode;
+} keymapLayout_s;
+
 typedef enum {
     kbStatusOff = 0,
     bbStatusOn
@@ -25,7 +31,10 @@ typedef enum {
 } keyboardInUse_e;
 
 void keyboard_initialise(void);
-void keyboard_sendKey(uint8_t keyCode, uint8_t pressedReleased);
+void keyboard_deinitialise(void);
+const keymapLayout_s * keyboard_translateKey(uint8_t rawKeyCode);
+uint8_t keyboard_translateModifier(uint8_t rawModifierCode);
+void keyboard_sendKey(uint8_t amigaKeyCode, uint8_t pressedReleased);
 void keyboard_assertReset(void);
 keyboardStatus_e keyboard_getStatus(void);
 keyboardInUse_e keyboard_getInUse(void);

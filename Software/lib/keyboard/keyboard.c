@@ -20,8 +20,10 @@ SBIT(KBRESET, KBRESET_PORT, KBRESET_PIN);
 SBIT(KBSTATUS, KBSTATUS_PORT, KBSTATUS_PIN);
 SBIT(KBINUSE, KBINUSE_PORT, KBINUSE_PIN);
 
-static const uint8_t keycode2ascii[128][3] =  {DE_KEYCODE_TO_ASCII};
-// THIS IS ASCII - NEEDS TO BE UPDATED TO AMIGA KEYCODES
+#define test
+
+static const keymapLayout_s keycodeTranslation[KEYCODE_TO_AMIGA_ENTERIES] = {DE_KEYCODE_TO_AMIGA};
+static const keymapLayout_s modifierTranslation[MODIFIER_TO_AMIGA_ENTERIES] = {DE_MODIFIER_TO_AMIGA};
 
 void keyboard_initialise(void) {
 
@@ -42,7 +44,46 @@ void keyboard_initialise(void) {
     KBINUSE_DIR_PU = KBINUSE_DIR_PU | (1 << KBINUSE_PIN);
 }
 
-void keyboard_sendKey(uint8_t keyCode, uint8_t pressedReleased) {
+void keyboard_deinitialise(void) {
+    
+    KBRESET = 1;
+    KBDATA = 1;
+    KBCLOCK = 1;
+}
+
+const keymapLayout_s * keyboard_translateKey(uint8_t rawKeyCode) {
+    
+    const keymapLayout_s * decodedKeyCode = 0;
+
+    for (uint8_t i = 0; i < KEYCODE_TO_AMIGA_ENTERIES; i++) {
+        // Not the most efficient method, but let's start with something...
+
+        if (rawKeyCode == keycodeTranslation[i].rawKeyCode) {
+            decodedKeyCode = &keycodeTranslation[i];
+            break;
+        }        
+    }
+
+    return (decodedKeyCode);
+}
+
+uint8_t keyboard_translateModifier(uint8_t rawModifierCode) {
+
+    uint8_t amigaModifierCode = 0;
+
+    for (uint8_t i = 0; i < MODIFIER_TO_AMIGA_ENTERIES; i++) {
+        // Not the most efficient method, but let's start with something...
+
+        if (rawModifierCode == modifierTranslation[i].rawKeyCode) {
+            amigaModifierCode = keycodeTranslation[i].amigaKeyCode;
+            break;
+        }        
+    }
+
+    return (amigaModifierCode);
+}
+
+void keyboard_sendKey(uint8_t amigaKeyCode, uint8_t pressedReleased) {
     //         _____   ___   ___   ___   ___   ___   ___   ___   _________
     // KBCLOCK      \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
     //         ___________________________________________________________
@@ -55,7 +96,7 @@ void keyboard_sendKey(uint8_t keyCode, uint8_t pressedReleased) {
     // Code taken from repo here: https://github.com/PR77/PS2_Keyboard_Adapter
 
     uint8_t z = 0x80; 
-    uint8_t keyCodeToSend = (keyCode << 1);
+    uint8_t keyCodeToSend = (amigaKeyCode << 1);
 
     keyCodeToSend |= (pressedReleased) ? 0x00 : 0x01; 
 

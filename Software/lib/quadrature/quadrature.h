@@ -47,6 +47,7 @@ typedef enum {
 
 void quadrature_timer2Interrupt(void) __interrupt(INT_NO_TMR2);
 void quadrature_initialise(encodingRate_e encodingRate);
+void quadrature_deinitialise(void);
 inline void quadrature_startEncoding(void);
 inline void quadrature_stopEncoding(void);
 void quadrature_updateCounts(uint8_t channelIndex, int8_t counts);

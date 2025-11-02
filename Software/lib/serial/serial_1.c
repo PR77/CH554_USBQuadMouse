@@ -11,6 +11,7 @@
 #include <compiler.h>
 #include "ch554.h"
 #include "tick.h"
+#include "system.h"
 #include "serial_1.h"
 
 #if defined(SERIAL_1_ENABLE_TX_INTERRUPTS)
@@ -189,6 +190,10 @@ void serial_sendByteSerial1Interrupt(uint8_t character) {
         serial_transmitTriggerred = 1;
     } else {
         serial_enableSerial1Interrupt();
+        system_mDelayuS(5);
+        // Delay 5us to allow any pending interrupt to complete thus ensuring
+        // our write and read indexes are correctly updated. Not ideal, but
+        // effective.
         while (nextWriteIndex == serial_transmitReadIndex) {
             // Wait for free space in buffer before pushing next character
             // into it. When this occurs, then sendByte...() will be blocking.
