@@ -75,7 +75,7 @@ uint8_t keyboard_translateModifier(uint8_t rawModifierCode) {
         // Not the most efficient method, but let's start with something...
 
         if (rawModifierCode == modifierTranslation[i].rawKeyCode) {
-            amigaModifierCode = keycodeTranslation[i].amigaKeyCode;
+            amigaModifierCode = modifierTranslation[i].amigaKeyCode;
             break;
         }        
     }
