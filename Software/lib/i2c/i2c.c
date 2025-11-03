@@ -26,16 +26,16 @@
 // The exact number of clock cycles required for jumps and thus also loops cannot 
 // be precisely predicted. However, this can be accepted for this type of 
 // application (synchronous data transmission).
-#if F_CPU >= 24000000                                       // ~500kHz I2C clock
+#if FREQ_SYS == 24000000                                       // ~500kHz I2C clock
   #define I2C_DELAY_H() __asm__("sjmp .+2");++SAFE_MOD      // delay 6-7 clock cycles
   #define I2C_DELAY_L() __asm__("sjmp .+2");++SAFE_MOD      // delay 6-7 clock cycles
-#elif F_CPU >= 16000000                                     // ~500kHz I2C clock
+#elif FREQ_SYS == 16000000                                     // ~500kHz I2C clock
   #define I2C_DELAY_H() __asm__("sjmp .+2")                 // delay 4-5 clock cycles
   #define I2C_DELAY_L()                                     // no delay
-#elif F_CPU >= 12000000                                     // ~360kHz I2C clock
+#elif FREQ_SYS == 12000000                                     // ~360kHz I2C clock
   #define I2C_DELAY_H() __asm__("orl _SAFE_MOD, #0x00")     // delay 3 clock cycles
   #define I2C_DELAY_L()                                     // no delay
-#elif F_CPU >= 6000000                                      // ~200kHz I2C clock
+#elif FREQ_SYS == 6000000                                      // ~200kHz I2C clock
   #define I2C_DELAY_H() __asm__("nop")                      // delay 1 clock cycle
   #define I2C_DELAY_L()                                     // no delay
 #else                                                       // ~100kHz I2C clock

@@ -18,12 +18,12 @@
 // License: http://creativecommons.org/licenses/by-sa/3.0/
 
 // ===================================================================================
-// Set global PWM frequency (in Hertz, range: F_CPU/65536 - F_CPU/256)
+// Set global PWM frequency (in Hertz, range: FREQ_SYS/65536 - FREQ_SYS/256)
 // ===================================================================================
 #define PWM_set_freq(FREQ) \
-    (((FREQ) >= F_CPU / 256) ? (PWM_CK_SE = 0)              : \
-    (((F_CPU / 256 / (FREQ) - 1) > 255) ? (PWM_CK_SE = 255) : \
-    (PWM_CK_SE = (uint8_t)(F_CPU / 256 / (FREQ) - 1))         \
+    (((FREQ) >= FREQ_SYS / 256) ? (PWM_CK_SE = 0)              : \
+    (((FREQ_SYS / 256 / (FREQ) - 1) > 255) ? (PWM_CK_SE = 255) : \
+    (PWM_CK_SE = (uint8_t)(FREQ_SYS / 256 / (FREQ) - 1))         \
 ))
 
 SBIT(BUZZER_OUTPUT, BUZZER_OUTPUT_PORT, BUZZER_OUTPUT_PIN);

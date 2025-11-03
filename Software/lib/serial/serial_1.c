@@ -99,6 +99,12 @@ void serial_initialiseSerial1(uint32_t baudRate, uint8_t alternativePins) {
 #else
     GPIO_IE = GPIO_IE & ~bIE_RXD1_LO;
 #endif
+
+#if defined(SERIAL_1_ENABLE_TX_INTERRUPTS) || defined(SERIAL_1_ENABLE_RX_INTERRUPTS)
+    U1TI = 0;
+    U1RI = 0;
+    serial_enableSerial1Interrupt();
+#endif
 }
 
 inline void serial_disableSerial1Interrupt(void) {
@@ -177,34 +183,22 @@ uint16_t serial_getByteSerial1Blocking(uint32_t timeout) {
 #if defined(SERIAL_1_ENABLE_TX_INTERRUPTS)
 void serial_sendByteSerial1Interrupt(uint8_t character) {
 
-    volatile uint8_t nextWriteIndex = 0;
+    volatile uint8_t nextWriteIndex = (serial_transmitWriteIndex + 1) & SERIAL_1_TX_BUFFER_MASK;;
 
-    serial_disableSerial1Interrupt();
-    nextWriteIndex = (serial_transmitWriteIndex + 1) & SERIAL_1_TX_BUFFER_MASK;
-
-    if ((serial_transmitWriteIndex == serial_transmitReadIndex) && (serial_transmitTriggerred == 0)) {
-        // Transmission buffer was empty, before triggering next transmission wait
-        // for any pending transmission to finish (TI == 0) before updating SBUF1.
-        // Writing to SBUF1 will trigger the transmission.
-        U1TI = 1;
-        serial_transmitTriggerred = 1;
-    } else {
-        serial_enableSerial1Interrupt();
-        system_mDelayuS(5);
-        // Delay 5us to allow any pending interrupt to complete thus ensuring
-        // our write and read indexes are correctly updated. Not ideal, but
-        // effective.
-        while (nextWriteIndex == serial_transmitReadIndex) {
-            // Wait for free space in buffer before pushing next character
-            // into it. When this occurs, then sendByte...() will be blocking.
-            ;
-        }
-        serial_disableSerial1Interrupt();
+    while (nextWriteIndex == serial_transmitReadIndex) {
+        // Wait for free space in buffer before pushing next character into it.
+        // When this occurs, then sendByte...() will be blocking.
+        ;
     }
-    
+
     serial_transmitBuffer[serial_transmitWriteIndex] = character;
     serial_transmitWriteIndex = nextWriteIndex;
-    serial_enableSerial1Interrupt();
+
+    if ((U1TI == 0) && (serial_transmitTriggerred == 0)) {
+        SBUF1 = serial_transmitBuffer[serial_transmitReadIndex];
+        serial_transmitReadIndex = (serial_transmitReadIndex + 1) & SERIAL_1_TX_BUFFER_MASK;
+        serial_transmitTriggerred = 1;
+    }
 }
 #endif // SERIAL_1_ENABLE_TX_INTERRUPTS
 

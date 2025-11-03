@@ -14,7 +14,7 @@
 #include "ch554.h"
 
 #ifndef SERIAL_BAUD_RATE
-#define SERIAL_BAUD_RATE        38400
+#define SERIAL_BAUD_RATE        57600
 #endif
 
 #define RECEIVE_TIMEOUT         (uint16_t)UINT16_MAX
