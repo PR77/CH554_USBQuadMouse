@@ -195,9 +195,9 @@ void serial_sendByteSerial1Interrupt(uint8_t character) {
     serial_transmitWriteIndex = nextWriteIndex;
 
     if ((U1TI == 0) && (serial_transmitTriggerred == 0)) {
-        SBUF1 = serial_transmitBuffer[serial_transmitReadIndex];
-        serial_transmitReadIndex = (serial_transmitReadIndex + 1) & SERIAL_1_TX_BUFFER_MASK;
+        // Trigger transmission if UART is not busy and has not already been triggered.
         serial_transmitTriggerred = 1;
+        U1TI = 1;
     }
 }
 #endif // SERIAL_1_ENABLE_TX_INTERRUPTS
