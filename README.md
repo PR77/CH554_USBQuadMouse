@@ -19,6 +19,10 @@ PCB version has been routed and manufactured for supporting a mouse or keyboard.
 
 OLED is also supported so you can see some information for example keyboard and mouse report data.
 
+# Notes
+
+Keyboard support is still work-in-progress. Keep an eye on the repo and I will advise once it is complete.
+
 # Credits
 I refacted a lot of the original libraries into various software components. However there were some repos which provided me with excellent information, tools and resources;
 - https://github.com/wagiminator
