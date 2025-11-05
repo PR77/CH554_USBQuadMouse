@@ -79,10 +79,6 @@ void main(void) {
     tick_initialiseTimer0();
     tick_enableTimer0Interrupt();
 
-    // Setup quadrature encoder and mouse button emulation
-    quadrature_initialise(encodingRate2000Hz);
-    buttons_initialise(1);
-
     // Setup heartbeat LED
     heartbeat_initialise();
 
@@ -108,11 +104,6 @@ void main(void) {
     ssd1306_setCursor(0, 0);
     ssd1306_printString("USB <-> AMIGA X-LATER");
     serial_printString("\x1b[2J\x1b[HUSB MOUSE + KEYBOARD <-> AMIGA X-LATER RUNNING...\n\r");
-
-    quadrature_startEncoding();
-    buzzer_startBuzzer();
-    system_mDelaymS(BUZZER_ACTIVE_DURATION_MS);
-    buzzer_stopBuzzer();
 
     while (1) {
 
@@ -165,6 +156,7 @@ void main(void) {
         }
 
         if (FoundNewDev) {
+            static uint8_t mouseInitialised = 0, keyboardInitialised = 0;
             FoundNewDev = 0;
 
             usbStatus = EnumAllRootDevice();
@@ -172,10 +164,46 @@ void main(void) {
                 ssd1306_setCursor(0, 2);
                 ssd1306_printString("ENUMERATION ERROR  ");
                 ssd1306_printHexByte(usbStatus);
-            }
+            } else {
+                // Logic to initialise / deinitialise Mouse or Keyboard depending
+                // on what device has been inserted or removed.
 
-            // TODO: Put logic here to initialise / deinitialise Mouse or Keyboard depending
-            // on what device has been inserted or removed.
+                if (SearchTypeDevice(DEV_TYPE_KEYBOARD) != 0xFFFF) {
+                    // Keyboard found and enumerated.
+
+                    if (mouseInitialised) {
+                        quadrature_deinitialise();
+                        mouseInitialised = 0;
+                    }
+
+                    if (!keyboardInitialised) {
+                        // Setup Amiga keyboard emulation
+                        keyboard_initialise();
+                        buzzer_startBuzzer();
+                        system_mDelaymS(BUZZER_ACTIVE_DURATION_MS);
+                        buzzer_stopBuzzer();
+                        keyboardInitialised = 1;
+                    }
+                }
+
+                if (SearchTypeDevice(DEV_TYPE_MOUSE) != 0xFFFF) {
+                    // Mouse found and enumerated.
+
+                    if (keyboardInitialised) {
+                        keyboard_deinitialise();
+                        keyboardInitialised = 0;
+                    }
+
+                    if (!mouseInitialised) {
+                        // Setup quadrature encoder and mouse button emulation
+                        quadrature_initialise(encodingRate2000Hz);
+                        buzzer_startBuzzer();
+                        system_mDelaymS(BUZZER_ACTIVE_DURATION_MS);
+                        buzzer_stopBuzzer();
+                        mouseInitialised = 1;
+                    }
+                }  
+            }
         }
 
         if ((tick_get1msTimerCount() - previousCountUSBTransfer) > USB_TRANSFER_RATE_MS) {
