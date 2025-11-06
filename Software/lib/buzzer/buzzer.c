@@ -4,7 +4,7 @@
 * License       : MIT
 * Version       : V1.0
 * Date          : 2025/05/19
-* Description   : CH554 Mouse Buzzer
+* Description   : CH554 Buzzer engine
 *******************************************************************************/
 
 #include <stdint.h>

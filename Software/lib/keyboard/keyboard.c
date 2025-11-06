@@ -51,36 +51,59 @@ void keyboard_deinitialise(void) {
     KBCLOCK = 1;
 }
 
-const keymapLayout_s * keyboard_translateKey(uint8_t rawKeyCode) {
+uint8_t keyboard_translateKey(uint8_t rawKeyCode, const keymapLayout_s **decodedKeyCode) {
     
-    const keymapLayout_s * decodedKeyCode = 0;
+    uint8_t foundEntry = 0;
 
     for (uint8_t i = 0; i < KEYCODE_TO_AMIGA_ENTERIES; i++) {
         // Not the most efficient method, but let's start with something...
 
         if (rawKeyCode == keycodeTranslation[i].rawKeyCode) {
-            decodedKeyCode = &keycodeTranslation[i];
+            *decodedKeyCode = &keycodeTranslation[i];
+            foundEntry = 1;
             break;
         }        
     }
 
-    return (decodedKeyCode);
+    return (foundEntry);
 }
 
-uint8_t keyboard_translateModifier(uint8_t rawModifierCode) {
+uint8_t keyboard_translateModifier(uint8_t rawKeyCode, const keymapLayout_s **decodedModifierCode) {
 
-    uint8_t amigaModifierCode = 0;
+    uint8_t foundEntry = 0;
 
     for (uint8_t i = 0; i < MODIFIER_TO_AMIGA_ENTERIES; i++) {
         // Not the most efficient method, but let's start with something...
 
-        if (rawModifierCode == modifierTranslation[i].rawKeyCode) {
-            amigaModifierCode = modifierTranslation[i].amigaKeyCode;
+        if (rawKeyCode == modifierTranslation[i].rawKeyCode) {
+            *decodedModifierCode = &modifierTranslation[i];
+            foundEntry = 1;
             break;
         }        
     }
 
-    return (amigaModifierCode);
+    return (foundEntry);
+}
+
+uint8_t keyboard_translateReset(uint8_t rawModifierCode) {
+
+    keyboardReset_e resetState = kbResetNotAsserted;
+    
+    // Amiga /RESET will be asserted when the following modifiers
+    // are all active;
+    // {KEY_MOD_LCTRL } /* LEFT-CONTROL */
+    // {KEY_MOD_RCTRL } /* RIGHT-CONTROL*/
+    // {KEY_MOD_LMETA } /* LEFT-META    */
+
+    if (rawModifierCode == (KEY_MOD_LCTRL | KEY_MOD_RCTRL | KEY_MOD_LMETA)) {
+        KBRESET = 0;
+        system_mDelayuS(200);
+        KBRESET = 1;
+
+        resetState = kbResetAsserted;
+    }
+
+    return (resetState);
 }
 
 void keyboard_sendKey(uint8_t amigaKeyCode, uint8_t pressedReleased) {
@@ -115,13 +138,6 @@ void keyboard_sendKey(uint8_t amigaKeyCode, uint8_t pressedReleased) {
     }
 
     system_mDelayuS(200);
-}
-
-void keyboard_assertReset(void) {
-
-    KBRESET = 0;
-    system_mDelayuS(200);
-    KBRESET = 1;
 }
 
 keyboardStatus_e keyboard_getStatus(void) {

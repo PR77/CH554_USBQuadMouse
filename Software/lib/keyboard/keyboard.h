@@ -30,12 +30,17 @@ typedef enum {
     bbInUseOn
 } keyboardInUse_e;
 
+typedef enum {
+    kbResetNotAsserted = 0,
+    kbResetAsserted
+} keyboardReset_e;
+
 void keyboard_initialise(void);
 void keyboard_deinitialise(void);
-const keymapLayout_s * keyboard_translateKey(uint8_t rawKeyCode);
-uint8_t keyboard_translateModifier(uint8_t rawModifierCode);
+uint8_t keyboard_translateKey(uint8_t rawKeyCode, const keymapLayout_s **decodedKeyCode);
+uint8_t keyboard_translateModifier(uint8_t rawKeyCode, const keymapLayout_s **rawModifierCode);
+keyboardReset_e keyboard_translateReset(uint8_t rawModifierCode);
 void keyboard_sendKey(uint8_t amigaKeyCode, uint8_t pressedReleased);
-void keyboard_assertReset(void);
 keyboardStatus_e keyboard_getStatus(void);
 keyboardInUse_e keyboard_getInUse(void);
 

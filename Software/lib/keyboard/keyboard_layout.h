@@ -223,12 +223,13 @@
     {KEY_MOD_LCTRL,     AMIGA_L_CTRL   ,   0}, /* LEFT-CONTROL */  \
     {KEY_MOD_LSHIFT,    AMIGA_L_SHIFT  ,   0}, /* LEFT-SHIFT   */  \
     {KEY_MOD_LALT,      AMIGA_L_R_ALT  ,   0}, /* LEFT-ALT     */  \
+    {KEY_MOD_RCTRL,     AMIGA_L_CTRL   ,   0}, /* RIGHT-CONTROL*/  \
     {KEY_MOD_RSHIFT,    AMIGA_R_SHIFT  ,   0}, /* RIGHT-SHIFT  */  \
     {KEY_MOD_RALT,      AMIGA_L_R_ALT  ,   0}, /* LEFT-ALT     */  \
     {KEY_MOD_LMETA,     AMIGA_L_AMIGA  ,   0}, /* LEFT-AMIGA   */  \
     {KEY_MOD_RMETA,     AMIGA_R_AMIGA  ,   0}  /* RIGHT-AMIGA  */  
 
-#define MODIFIER_TO_AMIGA_ENTERIES 7
+#define MODIFIER_TO_AMIGA_ENTERIES 8
 
 #endif // LOCALISE_DE
 

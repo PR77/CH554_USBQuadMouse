@@ -239,18 +239,27 @@ void main(void) {
                 
                         len = USB_RX_LEN;                                   // received data length
                         if ((len) && (len <= DEFAULT_ENDP0_SIZE)) {
-                            const keymapLayout_s * receivedKey;
+                            const keymapLayout_s * receivedKey = 0;
+                            static devTypeKeyboardPayload_s previousReport = {0, 0, {0, 0, 0, 0, 0, 0}};
                             for (uint8_t i = 0; i < sizeof(devTypeKeyboardPayload_s); i++) {
                                 ssd1306_printHexByte((uint8_t)(RxBuffer[i]));
                             }
 
                             ssd1306_printString(", ");
 
-                            receivedKey = keyboard_translateKey(RxBuffer[2]);
-                            if (receivedKey->rawKeyCode != 0) {
-                                ssd1306_printCharacter(receivedKey->asciiCode);
-                            } else ssd1306_printCharacter(' ');
+                            // TODO: STILL NEED TO FINALISE THIS. NOT SURE IF THE REPORT
+                            // HANDLING SHOULD BE HERE OR IN THE KEYBOARD MODULE. NEED TO
+                            // HANDLE TWO KEY PRESSED AT THE SAME TIME - MAX.
 
+                            if (kbResetAsserted == keyboard_translateReset(RxBuffer[0])) {
+                                ssd1306_printString("RST");    
+                            } else {
+                                if (keyboard_translateModifier(RxBuffer[0], &receivedKey)) {
+                                    ssd1306_printString("MOD");
+                                } else if (keyboard_translateKey(RxBuffer[2], &receivedKey)) {
+                                    ssd1306_printCharacter(receivedKey->asciiCode);
+                                } else ssd1306_printString("   ");
+                            }
                         }
                     } else if (usbStatus != (USB_PID_NAK | ERR_USB_TRANSFER)) {
                         ssd1306_printString("K-BRD ERROR DETECTED ");
