@@ -48,25 +48,8 @@ __xdata _RootHubDev ThisUsbDev;                             // ROOT
 __xdata _DevOnHubPort DevOnHubPort[HUB_MAX_PORTS];          // Assumption: no more than 1 external HUB, each external HUB does not exceed HUB_MAX_PORTS ports (don’t care if there are more)
 __bit FoundNewDev;
 
-typedef struct {
-
-    uint8_t buttonStatus;
-    int8_t xAxisMovement;
-    int8_t yAxisMovement;
-    int8_t wheelMovement;
-
-} devTypeMousePayload_s;
-
-typedef struct {
-
-    uint8_t modifierKeys;
-    uint8_t reserved;
-    uint8_t keyCodes[6];
-    
-} devTypeKeyboardPayload_s;
-
 void main(void) {
-    static uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;
+    static __xdata uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;
     uint8_t usbStatus = (uint8_t)ERR_USB_UNKNOWN, len = 0, endp = 0;
     uint16_t usbLocation = 0;
 
@@ -240,23 +223,16 @@ void main(void) {
                         len = USB_RX_LEN;                                   // received data length
                         if ((len) && (len <= DEFAULT_ENDP0_SIZE)) {
                             const keymapLayout_s * receivedKey = 0;
-                            static devTypeKeyboardPayload_s previousReport = {0, 0, {0, 0, 0, 0, 0, 0}};
                             for (uint8_t i = 0; i < sizeof(devTypeKeyboardPayload_s); i++) {
                                 ssd1306_printHexByte((uint8_t)(RxBuffer[i]));
                             }
 
                             ssd1306_printString(", ");
 
-                            // TODO: STILL NEED TO FINALISE THIS. NOT SURE IF THE REPORT
-                            // HANDLING SHOULD BE HERE OR IN THE KEYBOARD MODULE. NEED TO
-                            // HANDLE TWO KEY PRESSED AT THE SAME TIME - MAX.
-
                             if (kbResetAsserted == keyboard_translateReset(RxBuffer[0])) {
                                 ssd1306_printString("RST");    
                             } else {
-                                if (keyboard_translateModifier(RxBuffer[0], &receivedKey)) {
-                                    ssd1306_printString("MOD");
-                                } else if (keyboard_translateKey(RxBuffer[2], &receivedKey)) {
+                                if (keyboard_translateKey((devTypeKeyboardPayload_s *)RxBuffer, &receivedKey)) {
                                     ssd1306_printCharacter(receivedKey->asciiCode);
                                 } else ssd1306_printString("   ");
                             }

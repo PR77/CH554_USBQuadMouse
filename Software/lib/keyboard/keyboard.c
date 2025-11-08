@@ -8,6 +8,9 @@
 *******************************************************************************/
 
 #include <stdint.h>
+#include <compiler.h>
+#include <string.h>
+#include <stdlib.h>
 #include "ch554.h"
 #include "keyboard.h"
 #include "keyboard_cfg.h"
@@ -20,10 +23,44 @@ SBIT(KBRESET, KBRESET_PORT, KBRESET_PIN);
 SBIT(KBSTATUS, KBSTATUS_PORT, KBSTATUS_PIN);
 SBIT(KBINUSE, KBINUSE_PORT, KBINUSE_PIN);
 
-#define test
-
 static const keymapLayout_s keycodeTranslation[KEYCODE_TO_AMIGA_ENTERIES] = {DE_KEYCODE_TO_AMIGA};
 static const keymapLayout_s modifierTranslation[MODIFIER_TO_AMIGA_ENTERIES] = {DE_MODIFIER_TO_AMIGA};
+static __xdata devTypeKeyboardPayload_s previousRawKeyCodeReport;
+
+static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased) {
+    //         _____   ___   ___   ___   ___   ___   ___   ___   _________
+    // KBCLOCK      \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
+    //         ___________________________________________________________
+    // KBDATA     \_____X_____X_____X_____X_____X_____X_____X_____/
+    //           (6)   (5)   (4)   (3)   (2)   (1)   (0)   (7)
+    //
+    //          First                                     Last
+    //          sent                                      sent
+
+    // Code taken from repo here: https://github.com/PR77/PS2_Keyboard_Adapter
+
+    uint8_t z = 0x80; 
+    uint8_t keyCodeToSend = (amigaKeyCode << 1);
+
+    keyCodeToSend |= (pressedReleased == kbKeyPressed) ? 0x00 : 0x01; 
+
+    for (uint8_t i = 0; i < 8; i++) {
+        KBDATA = !(keyCodeToSend & z);
+        
+        system_mDelayuS(20);
+        KBCLOCK = 0;
+        system_mDelayuS(20);
+        KBCLOCK = 1;
+
+        z = z >> 1 ;
+    }
+    system_mDelayuS(20);
+    
+    KBDATA = 1;
+    KBCLOCK = 1;
+    
+    system_mDelayuS(200);
+}
 
 void keyboard_initialise(void) {
 
@@ -42,6 +79,8 @@ void keyboard_initialise(void) {
 
     KBINUSE_MOD_OC = KBINUSE_MOD_OC | (1 << KBINUSE_PIN);
     KBINUSE_DIR_PU = KBINUSE_DIR_PU | (1 << KBINUSE_PIN);
+
+    memset(&previousRawKeyCodeReport, 0, sizeof(devTypeKeyboardPayload_s));
 }
 
 void keyboard_deinitialise(void) {
@@ -51,35 +90,69 @@ void keyboard_deinitialise(void) {
     KBCLOCK = 1;
 }
 
-uint8_t keyboard_translateKey(uint8_t rawKeyCode, const keymapLayout_s **decodedKeyCode) {
-    
+uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const keymapLayout_s **decodedKeyCode) {
+
     uint8_t foundEntry = 0;
 
-    for (uint8_t i = 0; i < KEYCODE_TO_AMIGA_ENTERIES; i++) {
-        // Not the most efficient method, but let's start with something...
+    if (rawKeyCodeReport->modifierKeys != previousRawKeyCodeReport.modifierKeys) {
+        // Check if there has been a modifier key pressed or released. Modifier key
+        // are bit encoded.
+        
+        // TODO: This only currently handles 1 modifier beening pressed at a time.
+        
+        if ((rawKeyCodeReport->modifierKeys != 0) && (previousRawKeyCodeReport.modifierKeys == 0)) {
+            // Key was pressed. Send key pressed sequence to Amiga.            
+            for (uint8_t i = 0; i < MODIFIER_TO_AMIGA_ENTERIES; i++) {
+                if (rawKeyCodeReport->modifierKeys == modifierTranslation[i].rawKeyCode) {
+                    keyboard_sendKey(modifierTranslation[i].amigaKeyCode, kbKeyPressed);
+                    *decodedKeyCode = &modifierTranslation[i];
+                    foundEntry = 1;
+                    break;
+                }
+            }
+        } else if ((rawKeyCodeReport->modifierKeys == 0) && (previousRawKeyCodeReport.modifierKeys != 0)) {
+            // Key was released. Send key released sequence to Amiga.
+            for (uint8_t i = 0; i < MODIFIER_TO_AMIGA_ENTERIES; i++) {
+                if (previousRawKeyCodeReport.modifierKeys == modifierTranslation[i].rawKeyCode) {
+                    keyboard_sendKey(modifierTranslation[i].amigaKeyCode, kbKeyReleased);
+                    break;
+                }
+            }
+        } else {
+            // Do nothing...
+        }
 
-        if (rawKeyCode == keycodeTranslation[i].rawKeyCode) {
-            *decodedKeyCode = &keycodeTranslation[i];
-            foundEntry = 1;
-            break;
-        }        
+        previousRawKeyCodeReport.modifierKeys = rawKeyCodeReport->modifierKeys;
     }
 
-    return (foundEntry);
-}
+    for (uint8_t i = 0; i < MAX_SUPPORTED_ACTIVE_KEYCODES; i++) {
+        // Itterate through all the keycodes in the keyboard data report. First check for
+        // new key pressed or key releases.
+        if (rawKeyCodeReport->keyCodes[i] != previousRawKeyCodeReport.keyCodes[i]) {
+            if ((rawKeyCodeReport->keyCodes[i] != 0) && (previousRawKeyCodeReport.keyCodes[i] == 0)) {
+                // Key was pressed. Send key pressed sequence to Amiga.            
+                for (uint8_t j = 0; j < KEYCODE_TO_AMIGA_ENTERIES; j++) {
+                    if (rawKeyCodeReport->keyCodes[i] == keycodeTranslation[j].rawKeyCode) {
+                        keyboard_sendKey(keycodeTranslation[j].amigaKeyCode, kbKeyPressed);
+                        *decodedKeyCode = &keycodeTranslation[j];
+                        foundEntry = 1;
+                        break;
+                    }
+                }
+            } else if ((rawKeyCodeReport->keyCodes[i] == 0) && (previousRawKeyCodeReport.keyCodes[i] != 0)) {
+                // Key was released. Send key released sequence to Amiga.
+                for (uint8_t j = 0; j < KEYCODE_TO_AMIGA_ENTERIES; j++) {
+                    if (previousRawKeyCodeReport.keyCodes[i] == keycodeTranslation[j].rawKeyCode) {
+                        keyboard_sendKey(keycodeTranslation[j].amigaKeyCode, kbKeyReleased);
+                        break;
+                    }
+                }
+            } else {
+                // Do nothing...
+            }
 
-uint8_t keyboard_translateModifier(uint8_t rawKeyCode, const keymapLayout_s **decodedModifierCode) {
-
-    uint8_t foundEntry = 0;
-
-    for (uint8_t i = 0; i < MODIFIER_TO_AMIGA_ENTERIES; i++) {
-        // Not the most efficient method, but let's start with something...
-
-        if (rawKeyCode == modifierTranslation[i].rawKeyCode) {
-            *decodedModifierCode = &modifierTranslation[i];
-            foundEntry = 1;
-            break;
-        }        
+            previousRawKeyCodeReport.keyCodes[i] = rawKeyCodeReport->keyCodes[i];
+        }
     }
 
     return (foundEntry);
@@ -106,46 +179,16 @@ uint8_t keyboard_translateReset(uint8_t rawModifierCode) {
     return (resetState);
 }
 
-void keyboard_sendKey(uint8_t amigaKeyCode, uint8_t pressedReleased) {
-    //         _____   ___   ___   ___   ___   ___   ___   ___   _________
-    // KBCLOCK      \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
-    //         ___________________________________________________________
-    // KBDATA     \_____X_____X_____X_____X_____X_____X_____X_____/
-    //           (6)   (5)   (4)   (3)   (2)   (1)   (0)   (7)
-    //
-    //          First                                     Last
-    //          sent                                      sent
-
-    // Code taken from repo here: https://github.com/PR77/PS2_Keyboard_Adapter
-
-    uint8_t z = 0x80; 
-    uint8_t keyCodeToSend = (amigaKeyCode << 1);
-
-    keyCodeToSend |= (pressedReleased) ? 0x00 : 0x01; 
-
-    KBDATA = 1;
-    KBCLOCK = 1;
-
-    for (uint8_t i = 0; i < 8; i++) {
-        KBDATA = !(keyCodeToSend & z);
-        
-        system_mDelayuS(20);
-        KBCLOCK = 0;
-        system_mDelayuS(20);
-        KBCLOCK = 1;
-
-        z = z >> 1 ;
-    }
-
-    system_mDelayuS(200);
-}
-
 keyboardStatus_e keyboard_getStatus(void) {
 
-    return (kbStatusOff);
+    keyboardStatus_e keyboardStatus = (KBSTATUS) ? kbStatusOn : kbStatusOff;
+    
+    return (keyboardStatus);
 }
 
 keyboardInUse_e keyboard_getInUse(void) {
 
-    return (kbInUseOff);
+    keyboardStatus_e keyboardInUse = (KBINUSE) ? kbInUseOn : kbInUseOff;
+
+    return (keyboardInUse);
 }

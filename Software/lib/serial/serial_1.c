@@ -15,16 +15,16 @@
 #include "serial_1.h"
 
 #if defined(SERIAL_1_ENABLE_TX_INTERRUPTS)
-static volatile uint8_t serial_transmitBuffer[SERIAL_1_TX_BUFFER_SIZE];
-static volatile uint8_t serial_transmitWriteIndex;
-static volatile uint8_t serial_transmitReadIndex;
-static volatile uint8_t serial_transmitTriggerred;
+static volatile __xdata uint8_t serial_transmitBuffer[SERIAL_1_TX_BUFFER_SIZE];
+static volatile __xdata uint8_t serial_transmitWriteIndex;
+static volatile __xdata uint8_t serial_transmitReadIndex;
+static volatile __xdata uint8_t serial_transmitTriggerred;
 #endif
 
 #if defined(SERIAL_1_ENABLE_RX_INTERRUPTS)
-static volatile uint8_t serial_receiveBuffer[SERIAL_1_RX_BUFFER_SIZE];
-static volatile uint8_t serial_receiveWriteIndex;
-static volatile uint8_t serial_receiveReadIndex;
+static volatile __xdata uint8_t serial_receiveBuffer[SERIAL_1_RX_BUFFER_SIZE];
+static volatile __xdata uint8_t serial_receiveWriteIndex;
+static volatile __xdata uint8_t serial_receiveReadIndex;
 #endif
 
 void serial_UART1Interrupt(void) __interrupt(INT_NO_UART1) {

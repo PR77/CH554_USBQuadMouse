@@ -14,6 +14,25 @@
 #include "ch554.h"
 #include "keyboard_cfg.h"
 
+#define NUMBER_OF_KEYCODES_IN_REPORT    6
+#define MAX_SUPPORTED_ACTIVE_KEYCODES   2
+
+#if (NUMBER_OF_KEYCODES_IN_REPORT > 6)
+#error NUMBER_OF_KEYCODES_IN_REPORT can not exceed 6  
+#endif
+
+#if (MAX_SUPPORTED_ACTIVE_KEYCODES >= NUMBER_OF_KEYCODES_IN_REPORT)
+#error MAX_SUPPORTED_ACTIVE_KEYCODES must be less than NUMBER_OF_KEYCODES_IN_REPORT 
+#endif
+
+typedef struct {
+
+    uint8_t modifierKeys;
+    uint8_t reserved;
+    uint8_t keyCodes[NUMBER_OF_KEYCODES_IN_REPORT];
+    
+} devTypeKeyboardPayload_s;
+
 typedef struct {
     uint8_t rawKeyCode;
     uint8_t amigaKeyCode;
@@ -21,13 +40,18 @@ typedef struct {
 } keymapLayout_s;
 
 typedef enum {
+    kbKeyPressed = 0,
+    kbKeyReleased
+} keyboardKey_e;
+
+typedef enum {
     kbStatusOff = 0,
-    bbStatusOn
+    kbStatusOn
 } keyboardStatus_e;
 
 typedef enum {
     kbInUseOff = 0,
-    bbInUseOn
+    kbInUseOn
 } keyboardInUse_e;
 
 typedef enum {
@@ -35,12 +59,11 @@ typedef enum {
     kbResetAsserted
 } keyboardReset_e;
 
+static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
 void keyboard_initialise(void);
 void keyboard_deinitialise(void);
-uint8_t keyboard_translateKey(uint8_t rawKeyCode, const keymapLayout_s **decodedKeyCode);
-uint8_t keyboard_translateModifier(uint8_t rawKeyCode, const keymapLayout_s **rawModifierCode);
+uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const keymapLayout_s **decodedKeyCode);
 keyboardReset_e keyboard_translateReset(uint8_t rawModifierCode);
-void keyboard_sendKey(uint8_t amigaKeyCode, uint8_t pressedReleased);
 keyboardStatus_e keyboard_getStatus(void);
 keyboardInUse_e keyboard_getInUse(void);
 

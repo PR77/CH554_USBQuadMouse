@@ -24,6 +24,15 @@
 
 typedef struct {
 
+    uint8_t buttonStatus;
+    int8_t xAxisMovement;
+    int8_t yAxisMovement;
+    int8_t wheelMovement;
+
+} devTypeMousePayload_s;
+
+typedef struct {
+
     uint8_t channelIndex;
     uint8_t sequenceCounts;
     uint8_t sequenceIndex;
