@@ -66,8 +66,10 @@ void main(void) {
     // Setup heartbeat LED
     heartbeat_initialise();
 
+#if defined(CONSOLE_DEBUG_ENABLED)
     // Setup serial port (debug)
     serial_initialiseSerial1(SERIAL_BAUD_RATE, 0);
+#endif // CONSOLE_DEBUG_ENABLED
 
     // Setup i2c and SSD1306 OLED
     i2c_initialise();
@@ -87,7 +89,9 @@ void main(void) {
     // Application code starts here ...
     ssd1306_setCursor(0, 0);
     ssd1306_printString("USB <-> AMIGA X-LATER");
+#if defined(CONSOLE_DEBUG_ENABLED)
     serial_printString("\x1b[2J\x1b[HUSB MOUSE + KEYBOARD <-> AMIGA X-LATER RUNNING...\n\r");
+#endif // CONSOLE_DEBUG_ENABLED
 
     while (1) {
 
