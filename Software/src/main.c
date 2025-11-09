@@ -4,7 +4,7 @@
 * License       : MIT
 * Version       : V1.0
 * Date          : 2024/12/17
-* Description   : CH554 USB <> QUADRATURE Encoder for Amiga
+* Description   : CH554 USB MOUSE + KEYBOARD <-> AMIGA X-LATER
 *******************************************************************************/
 
 #include <stdint.h>
