@@ -194,7 +194,7 @@ void main(void) {
             usbLocation = SearchTypeDevice(DEV_TYPE_KEYBOARD);
             if (usbLocation != 0xFFFF) {                                     // found a keyboard
                 ssd1306_setCursor(0, 2);
-                ssd1306_printString("ENUMERATION LOC ");
+                ssd1306_printString("KEYBOARD @ LOC ");
                 ssd1306_printHexWord(usbLocation);
             
                 ssd1306_setCursor(0, 3);
@@ -249,7 +249,7 @@ void main(void) {
             usbLocation = SearchTypeDevice(DEV_TYPE_MOUSE);
             if (usbLocation != 0xFFFF) {                                     // found a mouse (how to deal with two mice?)
                 ssd1306_setCursor(0, 2);
-                ssd1306_printString("ENUMERATION LOC ");
+                ssd1306_printString("MOUSE @ LOC ");
                 ssd1306_printHexWord(usbLocation);
             
                 ssd1306_setCursor(0, 3);
