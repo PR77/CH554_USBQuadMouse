@@ -26,11 +26,9 @@
 #endif
 
 typedef struct {
-
     uint8_t modifierKeys;
     uint8_t reserved;
-    uint8_t keyCodes[NUMBER_OF_KEYCODES_IN_REPORT];
-    
+    uint8_t keyCodes[NUMBER_OF_KEYCODES_IN_REPORT];   
 } devTypeKeyboardPayload_s;
 
 typedef struct {

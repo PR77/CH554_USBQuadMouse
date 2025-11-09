@@ -23,26 +23,14 @@
 #define TIMER_RELOAD_VALUE_HZ(x)    (uint16_t)(0xFFFF - (uint32_t)((FREQ_SYS/12)/(x)))
 
 typedef struct {
-
-    uint8_t buttonStatus;
-    int8_t xAxisMovement;
-    int8_t yAxisMovement;
-    int8_t wheelMovement;
-
-} devTypeMousePayload_s;
-
-typedef struct {
-
     uint8_t channelIndex;
     uint8_t sequenceCounts;
     uint8_t sequenceIndex;
     uint8_t direction;
     uint8_t directionChange;
-
 } quadratureOutput_s;
 
 typedef enum {
-
     encodingRate60Hz = 1,
     encodingRate1000Hz = 1000,
     encodingRate2000Hz = 2000,
@@ -51,7 +39,6 @@ typedef enum {
     encodingRate12000Hz = 12000,
     encodingRate14000Hz = 14000,
     encodingRateMaximum
-
 } encodingRate_e;
 
 void quadrature_timer2Interrupt(void) __interrupt(INT_NO_TMR2);

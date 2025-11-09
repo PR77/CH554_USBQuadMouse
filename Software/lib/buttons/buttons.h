@@ -14,7 +14,12 @@
 #include "ch554.h"
 #include "buttons_cfg.h"
 
-void buttons_initialise(uint8_t invertSignal);
+typedef enum {
+    dontInvertButtons = 0,
+    invertButtons
+} buttonsInvert_e;
+
+void buttons_initialise(buttonsInvert_e invertState);
 void buttons_leftButton(uint8_t buttonState);
 void buttons_rightButton(uint8_t buttonState);
 

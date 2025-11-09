@@ -4,7 +4,7 @@
     "size_xram": 896,
     "size_code": 14336,
     "size_heap": 0,
-    "mcu": "wch554",
+    "mcu": "8051",
     "cpu": "mcs51"
   },
   "frameworks": ["sdcc"],
@@ -16,7 +16,7 @@
       "custom" , "ch55x"
     ]
   },
-  "name": "Generic CH554 Board",
+  "name": "Generic CH554",
   "url": "https://www.wch-ic.com",
   "vendor": "WCH"
 }

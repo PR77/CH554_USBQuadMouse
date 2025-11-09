@@ -15,6 +15,7 @@
 #include "tick.h"
 #include "quadrature.h"
 #include "keyboard.h"
+#include "mouse.h"
 #include "buttons.h"
 #include "buzzer.h"
 #include "i2c.h"
@@ -155,16 +156,14 @@ void main(void) {
                     // Keyboard found and enumerated.
 
                     if (mouseInitialised) {
-                        quadrature_deinitialise();
+                        mouse_deinitialise();
                         mouseInitialised = 0;
                     }
 
                     if (!keyboardInitialised) {
                         // Setup Amiga keyboard emulation
                         keyboard_initialise();
-                        buzzer_startBuzzer();
-                        system_mDelaymS(BUZZER_ACTIVE_DURATION_MS);
-                        buzzer_stopBuzzer();
+                        buzzer_pulseBuzzer(BUZZER_ACTIVE_DURATION_MS);
                         keyboardInitialised = 1;
                     }
                 }
@@ -179,10 +178,8 @@ void main(void) {
 
                     if (!mouseInitialised) {
                         // Setup quadrature encoder and mouse button emulation
-                        quadrature_initialise(encodingRate2000Hz);
-                        buzzer_startBuzzer();
-                        system_mDelaymS(BUZZER_ACTIVE_DURATION_MS);
-                        buzzer_stopBuzzer();
+                        mouse_initialise();
+                        buzzer_pulseBuzzer(BUZZER_ACTIVE_DURATION_MS);
                         mouseInitialised = 1;
                     }
                 }  
@@ -191,6 +188,8 @@ void main(void) {
 
         if ((tick_get1msTimerCount() - previousCountUSBTransfer) > USB_TRANSFER_RATE_MS) {
             previousCountUSBTransfer += USB_TRANSFER_RATE_MS;
+
+            // Keyboard emulation --->
 
             usbLocation = SearchTypeDevice(DEV_TYPE_KEYBOARD);
             if (usbLocation != 0xFFFF) {                                     // found a keyboard
@@ -245,6 +244,8 @@ void main(void) {
                 }
             }
 
+            // Mouse emulation --->
+
             usbLocation = SearchTypeDevice(DEV_TYPE_MOUSE);
             if (usbLocation != 0xFFFF) {                                     // found a mouse (how to deal with two mice?)
                 ssd1306_setCursor(0, 2);
@@ -275,49 +276,19 @@ void main(void) {
                 
                         len = USB_RX_LEN;                                   // received data length
                         if ((len) && (len <= DEFAULT_ENDP0_SIZE)) {
-                            static int8_t previousXCounts = 0, previousYCounts = 0;
-
                             for (uint8_t i = 0; i < sizeof(devTypeMousePayload_s); i++) {
                                 ssd1306_printHexByte((uint8_t)(RxBuffer[i]));
                             }
                             ssd1306_printString(", ");
 
-                            ssd1306_setCursor(10, 3);
-                            if ((uint8_t)(RxBuffer[0]) & 0x01) {
-                                buttons_leftButton(1);
-                                ssd1306_printString("L");
-                            } else {
-                                buttons_leftButton(0);
-                                ssd1306_printString("-");
-                            }
+                            if (mouse_translateMovement((devTypeMousePayload_s *)RxBuffer)) {
+                                ssd1306_printHexByte(quadrature_getCounts(QUADRATURE_X_CHANNEL));
+                                ssd1306_printString(", ");
+                                ssd1306_printHexByte(quadrature_getCounts(QUADRATURE_Y_CHANNEL));
+                                ssd1306_printString(", ");
+                            } else ssd1306_printString("00, 00, ");
 
-                            ssd1306_setCursor(11, 3);
-                            if ((uint8_t)(RxBuffer[0]) & 0x04) {
-                                ssd1306_printString("M");
-                            } else ssd1306_printString("-");
-                            
-                            ssd1306_setCursor(12, 3);
-                            if ((uint8_t)(RxBuffer[0]) & 0x02) {
-                                buttons_rightButton(1);
-                                ssd1306_printString("R, ");
-                            } else {
-                                buttons_rightButton(0);
-                                ssd1306_printString("-, ");
-                            }
-
-                            if (previousXCounts != (int8_t)(RxBuffer[1])) {
-                                previousXCounts = (int8_t)(RxBuffer[1]);
-                                quadrature_updateCounts(QUADRATURE_X_CHANNEL, previousXCounts);
-                            }
-
-                            if (previousYCounts != (int8_t)(RxBuffer[2])) {
-                                previousYCounts = (int8_t)(RxBuffer[2]);
-                                quadrature_updateCounts(QUADRATURE_Y_CHANNEL, previousYCounts);
-                            }
-
-                            ssd1306_printHexByte(quadrature_getCounts(QUADRATURE_X_CHANNEL));
-                            ssd1306_printString(", ");
-                            ssd1306_printHexByte(quadrature_getCounts(QUADRATURE_Y_CHANNEL));
+                            ssd1306_printString(mouse_getButtonString((devTypeMousePayload_s *)RxBuffer));
                         }
                     } else if (usbStatus != (USB_PID_NAK | ERR_USB_TRANSFER)) {
                         ssd1306_printString("MOUSE ERROR DETECTED ");

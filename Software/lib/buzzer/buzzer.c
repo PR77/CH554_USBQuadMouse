@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include "ch554.h"
+#include "system.h"
 #include "buzzer.h"
 #include "buzzer_cfg.h"
 
@@ -51,4 +52,14 @@ inline void buzzer_stopBuzzer(void) {
 
 inline void buzzer_toggleBuzzer(void) {
     PWM_CTRL = PWM_CTRL ^ bPWM2_OUT_EN;
+}
+
+inline void buzzer_pulseBuzzer(uint16_t msDuration) {
+    
+    if (msDuration) {
+        buzzer_startBuzzer();
+        system_mDelaymS(msDuration);
+    }
+
+    buzzer_stopBuzzer();
 }

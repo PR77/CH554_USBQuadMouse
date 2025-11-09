@@ -18,5 +18,6 @@ void buzzer_initialise(void);
 inline void buzzer_startBuzzer(void);
 inline void buzzer_stopBuzzer(void);
 inline void buzzer_toggleBuzzer(void);
+inline void buzzer_pulseBuzzer(uint16_t msDuration);
 
 #endif // __CH554_BUZZER_H__

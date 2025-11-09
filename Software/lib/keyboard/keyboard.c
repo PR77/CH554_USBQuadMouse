@@ -158,7 +158,7 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
     return (foundEntry);
 }
 
-uint8_t keyboard_translateReset(uint8_t rawModifierCode) {
+keyboardReset_e keyboard_translateReset(uint8_t rawModifierCode) {
 
     keyboardReset_e resetState = kbResetNotAsserted;
     

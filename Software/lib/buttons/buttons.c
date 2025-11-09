@@ -15,9 +15,9 @@
 SBIT(LEFT_BUTTON, LEFT_BUTTON_PORT, LEFT_BUTTON_PIN);
 SBIT(RIGHT_BUTTON, RIGHT_BUTTON_PORT, RIGHT_BUTTON_PIN);
 
-static uint8_t invertButtonLogic = 0;
+static buttonsInvert_e invertButtonLogic = dontInvertButtons;
 
-void buttons_initialise(uint8_t invertSignal) {
+void buttons_initialise(buttonsInvert_e invertState) {
 
     LEFT_BUTTON_MOD_OC = LEFT_BUTTON_MOD_OC & ~(1 << LEFT_BUTTON_PIN);
     LEFT_BUTTON_DIR_PU = LEFT_BUTTON_DIR_PU | (1 << LEFT_BUTTON_PIN);
@@ -25,9 +25,9 @@ void buttons_initialise(uint8_t invertSignal) {
     RIGHT_BUTTON_MOD_OC = RIGHT_BUTTON_MOD_OC & ~(1 << RIGHT_BUTTON_PIN);
     RIGHT_BUTTON_DIR_PU = RIGHT_BUTTON_DIR_PU | (1 << RIGHT_BUTTON_PIN);
 
-    invertButtonLogic = invertSignal;
+    invertButtonLogic = invertState;
 
-    if (invertSignal) {
+    if (invertState == invertButtons) {
         LEFT_BUTTON = 1;
         RIGHT_BUTTON = 1;
     } else {
@@ -38,7 +38,7 @@ void buttons_initialise(uint8_t invertSignal) {
 
 void buttons_leftButton(uint8_t buttonState) {
 
-    if (buttonState ^ invertButtonLogic) {
+    if (buttonState ^ (uint8_t)invertButtonLogic) {
         LEFT_BUTTON = 1;
     } else {
         LEFT_BUTTON = 0;
@@ -47,7 +47,7 @@ void buttons_leftButton(uint8_t buttonState) {
 
 void buttons_rightButton(uint8_t buttonState) {
 
-    if (buttonState ^ invertButtonLogic) {
+    if (buttonState ^ (uint8_t)invertButtonLogic) {
         RIGHT_BUTTON = 1;
     } else {
         RIGHT_BUTTON = 0;
