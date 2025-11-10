@@ -154,7 +154,7 @@ uint8_t quadrature_getCounts(uint8_t channelIndex) {
     return (channelSequenceCount);
 }
 
-static void quadrature_channelUpdate(quadratureOutput_s * quadratureOutput) {
+static void quadrature_channelUpdate(quadratureOutput_s *quadratureOutput) {
 
     uint8_t currentSequenceIndex = 0, currentChannelIndex = 0;
 

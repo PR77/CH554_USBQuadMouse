@@ -35,6 +35,12 @@ uint8_t mouse_translateMovement(devTypeMousePayload_s *rawMouseReport) {
 
     uint8_t movementUpdate = 0;
 
+    // NULL pointer check - this function is called with the address of RxBuffer
+    // and need to ensure this buffer is not at 0.
+    if (NULL == rawMouseReport) {
+        return (0);
+    }
+
     if (rawMouseReport->xAxisMovement != previousRawMouseReport.xAxisMovement) {
         previousRawMouseReport.xAxisMovement = rawMouseReport->xAxisMovement;
         quadrature_updateCounts(QUADRATURE_X_CHANNEL, previousRawMouseReport.xAxisMovement);
@@ -74,16 +80,19 @@ char * mouse_getButtonString(devTypeMousePayload_s *rawMouseReport) {
     // with no buttons pressed "---", left "L--", middle "-M-" and right "--R".
     strncpy(buttonString, "---", sizeof(buttonString));
 
-    if (rawMouseReport->buttonState & MOUSE_BUTTON_LEFT) {
-        buttonString[0] = 'L';
-    }
-     
-    if (rawMouseReport->buttonState & MOUSE_BUTTON_MIDDLE) {
-        buttonString[1] = 'M';
-    }
-    
-    if (rawMouseReport->buttonState & MOUSE_BUTTON_RIGHT) {
-        buttonString[2] = 'R';
+    // NULL pointer check
+    if (NULL != rawMouseReport) {
+        if (rawMouseReport->buttonState & MOUSE_BUTTON_LEFT) {
+            buttonString[0] = 'L';
+        }
+        
+        if (rawMouseReport->buttonState & MOUSE_BUTTON_MIDDLE) {
+            buttonString[1] = 'M';
+        }
+        
+        if (rawMouseReport->buttonState & MOUSE_BUTTON_RIGHT) {
+            buttonString[2] = 'R';
+        }
     }
     
     return (buttonString);

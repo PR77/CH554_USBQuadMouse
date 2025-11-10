@@ -40,14 +40,16 @@ __code uint8_t SetupSetHIDIdle[]= { 0x21, HID_SET_IDLE, 0x00, 0x00, 0x00, 0x00, 
 __code uint8_t SetupGetHIDDevReport[] = { 0x81, USB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_REPORT, 0x00, 0x00, 0xFF, 0x00 };
 __code uint8_t SetupGetHubDescr[] = { HUB_GET_HUB_DESCRIPTOR, HUB_GET_DESCRIPTOR, 0x00, USB_DESCR_TYP_HUB, 0x00, 0x00, sizeof(USB_HUB_DESCR), 0x00 };
 
-__xdata uint8_t UsbDevEndp0Size;                                                      
-__xdata __at (0x0000) uint8_t RxBuffer[MAX_PACKET_SIZE];  // IN, must even address
-__xdata __at (0x0040) uint8_t TxBuffer[MAX_PACKET_SIZE];  // OUT, must even address
+__xdata uint8_t UsbDevEndp0Size;
+__xdata __at (0x0000) uint8_t TxBuffer[MAX_PACKET_SIZE];  // OUT, must even address
+__xdata __at (0x0040) uint8_t RxBuffer[MAX_PACKET_SIZE];  // IN, must even address
 
 uint8_t Set_Port = 0;
 __xdata _RootHubDev ThisUsbDev;                             // ROOT
 __xdata _DevOnHubPort DevOnHubPort[HUB_MAX_PORTS];          // Assumption: no more than 1 external HUB, each external HUB does not exceed HUB_MAX_PORTS ports (don’t care if there are more)
 __bit FoundNewDev;
+
+#define LOG(msg)   {serial_printString(__FILE__); serial_printCharacter(' '); serial_printHexWord(__LINE__); serial_printCharacter(' '); serial_printString(msg); serial_printString("\n\r");}
 
 void main(void) {
     static __xdata uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;

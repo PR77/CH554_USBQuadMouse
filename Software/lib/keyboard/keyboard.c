@@ -94,6 +94,17 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
 
     uint8_t foundEntry = 0;
 
+    // NULL pointer check - this function is called with the address of RxBuffer
+    // and need to ensure this buffer is not at 0.
+    if (NULL == rawKeyCodeReport) {
+        return (0);
+    }
+
+    // NULL pointer check
+    if (NULL == decodedKeyCode) {
+        return (0);
+    }
+    
     if (rawKeyCodeReport->modifierKeys != previousRawKeyCodeReport.modifierKeys) {
         // Check if there has been a modifier key pressed or released. Modifier key
         // are bit encoded.
