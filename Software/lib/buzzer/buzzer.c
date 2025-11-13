@@ -29,17 +29,30 @@
 
 SBIT(BUZZER_OUTPUT, BUZZER_OUTPUT_PORT, BUZZER_OUTPUT_PIN);
 
-void buzzer_initialise(void) {
+void buzzer_initialise(uint32_t frequency) {
 
     BUZZER_OUTPUT_MOD_OC = BUZZER_OUTPUT_MOD_OC & ~(1 << BUZZER_OUTPUT_PIN);
     BUZZER_OUTPUT_DIR_PU = BUZZER_OUTPUT_DIR_PU | (1 << BUZZER_OUTPUT_PIN);
 
-    PWM_set_freq(BUZZER_FREQUENCY_HZ);
+    buzzer_changeFrequency(frequency);
 
     PWM_CTRL = PWM_CTRL & ~bPWM2_OUT_EN;
     PWM_CTRL = PWM_CTRL | bPWM_CLR_ALL;
     PWM_CTRL = PWM_CTRL & ~bPWM_CLR_ALL;
     PWM_DATA2 = 0x7F;
+}
+
+inline void buzzer_changeFrequency(uint32_t frequency) {
+
+    uint32_t targetFrequency = 0;
+   
+    if ((frequency == 0) || (frequency > (FREQ_SYS / 256))) {
+        targetFrequency = BUZZER_FREQUENCY_HZ;
+    } else {
+        targetFrequency = frequency;    
+    }
+
+    PWM_set_freq(targetFrequency);
 }
 
 inline void buzzer_startBuzzer(void) {

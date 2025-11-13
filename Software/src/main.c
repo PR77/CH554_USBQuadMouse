@@ -81,8 +81,8 @@ void main(void) {
     // Setup and initialise USB host
     InitUSB_Host();
 
-    // Setup buzzer
-    buzzer_initialise();
+    // Setup buzzer with default frequency
+    buzzer_initialise(0);
 
     // Start timer tick and enable global interrupts
     tick_startTimer0();

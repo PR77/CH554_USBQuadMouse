@@ -14,7 +14,8 @@
 #include "ch554.h"
 #include "buzzer_cfg.h"
 
-void buzzer_initialise(void);
+void buzzer_initialise(uint32_t frequency);
+inline void buzzer_changeFrequency(uint32_t frequency);
 inline void buzzer_startBuzzer(void);
 inline void buzzer_stopBuzzer(void);
 inline void buzzer_toggleBuzzer(void);
