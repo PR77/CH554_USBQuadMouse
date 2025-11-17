@@ -23,6 +23,9 @@ SBIT(KBRESET, KBRESET_PORT, KBRESET_PIN);
 SBIT(KBSTATUS, KBSTATUS_PORT, KBSTATUS_PIN);
 SBIT(KBINUSE, KBINUSE_PORT, KBINUSE_PIN);
 
+#define STROBE_DELAY    15
+#define STROBE_KBCLOCK() { system_mDelayuS(STROBE_DELAY); KBCLOCK = 0; system_mDelayuS(STROBE_DELAY); KBCLOCK = 1; system_mDelayuS(STROBE_DELAY); }
+
 static const keymapLayout_s keycodeTranslation[KEYCODE_TO_AMIGA_ENTERIES] = {DE_KEYCODE_TO_AMIGA};
 static const keymapLayout_s modifierTranslation[MODIFIER_TO_AMIGA_ENTERIES] = {DE_MODIFIER_TO_AMIGA};
 static __xdata devTypeKeyboardPayload_s previousRawKeyCodeReport;
@@ -45,16 +48,11 @@ static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased
     keyCodeToSend |= (pressedReleased == kbKeyPressed) ? 0x00 : 0x01; 
 
     for (uint8_t i = 0; i < 8; i++) {
-        KBDATA = !(keyCodeToSend & z);
-        
-        system_mDelayuS(20);
-        KBCLOCK = 0;
-        system_mDelayuS(20);
-        KBCLOCK = 1;
+        KBDATA = (keyCodeToSend & z) ? 0 : 1;
+        STROBE_KBCLOCK();
 
         z = z >> 1 ;
     }
-    system_mDelayuS(20);
     
     KBDATA = 1;
     KBCLOCK = 1;
