@@ -53,6 +53,7 @@ __bit FoundNewDev;
 
 void main(void) {
     static __xdata uint32_t previousCountLEDFlash = 0, previousCountUSBTransfer = 0;
+    static __xdata uint8_t mouseInitialised = 0, keyboardInitialised = 0;
     uint8_t usbStatus = (uint8_t)ERR_USB_UNKNOWN, len = 0, endp = 0;
     uint16_t usbLocation = 0;
 
@@ -146,7 +147,6 @@ void main(void) {
         }
 
         if (FoundNewDev) {
-            static uint8_t mouseInitialised = 0, keyboardInitialised = 0;
             FoundNewDev = 0;
 
             usbStatus = EnumAllRootDevice();
@@ -190,6 +190,10 @@ void main(void) {
                     }
                 }  
             }
+        }
+
+        if (keyboardInitialised) {
+            keyboard_cyclicHanlder();
         }
 
         if ((tick_get1msTimerCount() - previousCountUSBTransfer) > USB_TRANSFER_RATE_MS) {

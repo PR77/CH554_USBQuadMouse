@@ -16,6 +16,14 @@
 
 #define NUMBER_OF_KEYCODES_IN_REPORT    6
 #define MAX_SUPPORTED_ACTIVE_KEYCODES   2
+#define INTER_KEY_DELAY_TO_AMIGA_MS     1
+
+#define KEY_QUEUE_BUFFER_SIZE           8
+#define KEY_QUEUE_BUFFER_MASK           (KEY_QUEUE_BUFFER_SIZE - 1)
+
+#if (KEY_QUEUE_BUFFER_SIZE & KEY_QUEUE_BUFFER_MASK)
+#error Key queue buffer size is not a power of 2
+#endif
 
 #if (NUMBER_OF_KEYCODES_IN_REPORT > 6)
 #error NUMBER_OF_KEYCODES_IN_REPORT can not exceed 6  
@@ -30,6 +38,12 @@ typedef struct {
     uint8_t reserved;
     uint8_t keyCodes[NUMBER_OF_KEYCODES_IN_REPORT];   
 } devTypeKeyboardPayload_s;
+
+typedef enum {
+    kbStateIdle = 0,
+    kbStateSendKeyCode,
+    kbStateWait
+} keyboardHandlerSt_e;
 
 typedef struct {
     uint8_t rawKeyCode;
@@ -57,9 +71,11 @@ typedef enum {
     kbResetAsserted
 } keyboardReset_e;
 
-static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
+//static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
+static void keyboard_queueKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
 void keyboard_initialise(void);
 void keyboard_deinitialise(void);
+void keyboard_cyclicHanlder(void);
 uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const keymapLayout_s **decodedKeyCode);
 keyboardReset_e keyboard_translateReset(uint8_t rawModifierCode);
 keyboardStatus_e keyboard_getStatus(void);

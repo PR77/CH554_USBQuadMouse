@@ -16,6 +16,7 @@
 #include "keyboard_cfg.h"
 #include "keyboard_layout.h"
 #include "system.h"
+#include "tick.h"
 
 SBIT(KBCLOCK, KBCLOCK_PORT, KBCLOCK_PIN);
 SBIT(KBDATA, KBDATA_PORT, KBDATA_PIN);
@@ -23,41 +24,34 @@ SBIT(KBRESET, KBRESET_PORT, KBRESET_PIN);
 SBIT(KBSTATUS, KBSTATUS_PORT, KBSTATUS_PIN);
 SBIT(KBINUSE, KBINUSE_PORT, KBINUSE_PIN);
 
-#define STROBE_DELAY    15
-#define STROBE_KBCLOCK() { system_mDelayuS(STROBE_DELAY); KBCLOCK = 0; system_mDelayuS(STROBE_DELAY); KBCLOCK = 1; system_mDelayuS(STROBE_DELAY); }
+#define STROBE_DELAY_NORM   15
+#define STROBE_DELAY_LONG   20
+#define STROBE_KBCLOCK() { system_mDelayuS(STROBE_DELAY_NORM); KBCLOCK = 0; system_mDelayuS(STROBE_DELAY_NORM); KBCLOCK = 1; system_mDelayuS(STROBE_DELAY_LONG); }
 
 static const keymapLayout_s keycodeTranslation[KEYCODE_TO_AMIGA_ENTERIES] = {DE_KEYCODE_TO_AMIGA};
 static const keymapLayout_s modifierTranslation[MODIFIER_TO_AMIGA_ENTERIES] = {DE_MODIFIER_TO_AMIGA};
 static __xdata devTypeKeyboardPayload_s previousRawKeyCodeReport;
+static __xdata keyboardHandlerSt_e keyboardHandlerState;
+static __xdata uint32_t keyCodeSendWaitTime;
 
-static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased) {
-    //         _____   ___   ___   ___   ___   ___   ___   ___   _________
-    // KBCLOCK      \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
-    //         ___________________________________________________________
-    // KBDATA     \_____X_____X_____X_____X_____X_____X_____X_____/
-    //           (6)   (5)   (4)   (3)   (2)   (1)   (0)   (7)
-    //
-    //          First                                     Last
-    //          sent                                      sent
+static __xdata uint8_t keyboard_queueKeyBuffer[KEY_QUEUE_BUFFER_SIZE];
+static __xdata uint8_t keyboard_queueWriteIndex;
+static __xdata uint8_t keyboard_queueReadIndex;
 
-    // Code taken from repo here: https://github.com/PR77/PS2_Keyboard_Adapter
+static void keyboard_queueKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased) {
 
-    uint8_t z = 0x80; 
-    uint8_t keyCodeToSend = (amigaKeyCode << 1);
+    uint8_t nextWriteIndex = (keyboard_queueWriteIndex + 1) & KEY_QUEUE_BUFFER_MASK;
+    uint8_t keyCodeToQueue = 0;
 
-    keyCodeToSend |= (pressedReleased == kbKeyPressed) ? 0x00 : 0x01; 
-
-    for (uint8_t i = 0; i < 8; i++) {
-        KBDATA = (keyCodeToSend & z) ? 0 : 1;
-        STROBE_KBCLOCK();
-
-        z = z >> 1 ;
+    if (nextWriteIndex == keyboard_queueReadIndex) {
+        // Queue is full, simply drop the entry and return.
+        return;
     }
-    
-    KBDATA = 1;
-    KBCLOCK = 1;
-    
-    system_mDelayuS(200);
+
+    keyCodeToQueue = (amigaKeyCode << 1);
+    keyCodeToQueue |= (pressedReleased == kbKeyPressed) ? 0x00 : 0x01; 
+    keyboard_queueKeyBuffer[keyboard_queueWriteIndex] = keyCodeToQueue;
+    keyboard_queueWriteIndex = nextWriteIndex;
 }
 
 void keyboard_initialise(void) {
@@ -65,7 +59,8 @@ void keyboard_initialise(void) {
     KBCLOCK_MOD_OC = KBCLOCK_MOD_OC & ~(1 << KBCLOCK_PIN);
     KBCLOCK_DIR_PU = KBCLOCK_DIR_PU | (1 << KBCLOCK_PIN);
 
-    KBDATA_MOD_OC = KBDATA_MOD_OC & ~(1 << KBDATA_PIN);
+    // KBDATA PIN needs to be bi-directional - so use the quasi-bidirectional mode.
+    KBDATA_MOD_OC = KBDATA_MOD_OC | (1 << KBDATA_PIN);
     KBDATA_DIR_PU = KBDATA_DIR_PU | (1 << KBDATA_PIN);
 
     KBRESET_MOD_OC = KBRESET_MOD_OC & ~(1 << KBRESET_PIN);
@@ -78,7 +73,13 @@ void keyboard_initialise(void) {
     KBINUSE_MOD_OC = KBINUSE_MOD_OC | (1 << KBINUSE_PIN);
     KBINUSE_DIR_PU = KBINUSE_DIR_PU | (1 << KBINUSE_PIN);
 
+    keyboard_queueWriteIndex = 0;
+    keyboard_queueReadIndex = 0;
+
+    keyboardHandlerState = kbStateIdle;
+
     memset(&previousRawKeyCodeReport, 0, sizeof(devTypeKeyboardPayload_s));
+    memset(&keyboard_queueKeyBuffer, 0, sizeof(keyboard_queueKeyBuffer));
 }
 
 void keyboard_deinitialise(void) {
@@ -86,6 +87,67 @@ void keyboard_deinitialise(void) {
     KBRESET = 1;
     KBDATA = 1;
     KBCLOCK = 1;
+    keyboardHandlerState = kbStateIdle;
+}
+
+void keyboard_cyclicHanlder(void) {
+
+    // TODO: There seems to be a 10ms delay between subsequent key transmissions.
+    // Need to check queue content.
+
+    switch (keyboardHandlerState) {
+        case (kbStateIdle): {
+            if (keyboard_queueWriteIndex != keyboard_queueReadIndex) {
+                // Keycode is waiting in the queue to be transmitted.
+                keyboardHandlerState = kbStateSendKeyCode;
+            }
+        }
+        break;
+    
+        case (kbStateSendKeyCode): {
+            uint8_t keyCodeToSend = keyboard_queueKeyBuffer[keyboard_queueReadIndex];
+            keyboard_queueReadIndex = (keyboard_queueReadIndex + 1) & KEY_QUEUE_BUFFER_MASK;
+
+        //         _____   ___   ___   ___   ___   ___   ___   ___   _________
+        // KBCLOCK      \_/   \_/   \_/   \_/   \_/   \_/   \_/   \_/
+        //         ___________________________________________________________
+        // KBDATA     \_____X_____X_____X_____X_____X_____X_____X_____/
+        //           (6)   (5)   (4)   (3)   (2)   (1)   (0)   (7)
+        //
+        //          First                                     Last
+        //          sent                                      sent
+
+        // Code taken from repo here: https://github.com/PR77/PS2_Keyboard_Adapter
+
+            KBDATA = 1;
+            KBCLOCK = 1;
+
+            for (uint8_t i = 0, z = 0x80; i < 8; i++) {
+                KBDATA = (keyCodeToSend & z) ? 0 : 1;
+                STROBE_KBCLOCK();
+
+                z = z >> 1 ;
+            }
+            
+            KBDATA = 1;
+            KBCLOCK = 1;
+            keyCodeSendWaitTime = tick_get1msTimerCount();
+            keyboardHandlerState = kbStateWait;
+        }
+        break;
+
+        case (kbStateWait): {
+            if ((tick_get1msTimerCount() - keyCodeSendWaitTime) > INTER_KEY_DELAY_TO_AMIGA_MS) {
+                keyboardHandlerState = kbStateIdle;
+            }
+        }
+        break;
+
+        default: {
+            keyboardHandlerState = kbStateIdle;
+        }
+        break;
+    }
 }
 
 uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const keymapLayout_s **decodedKeyCode) {
@@ -113,7 +175,8 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
             // Key was pressed. Send key pressed sequence to Amiga.            
             for (uint8_t i = 0; i < MODIFIER_TO_AMIGA_ENTERIES; i++) {
                 if (rawKeyCodeReport->modifierKeys == modifierTranslation[i].rawKeyCode) {
-                    keyboard_sendKey(modifierTranslation[i].amigaKeyCode, kbKeyPressed);
+                    //keyboard_sendKey(modifierTranslation[i].amigaKeyCode, kbKeyPressed);
+                    keyboard_queueKey(modifierTranslation[i].amigaKeyCode, kbKeyPressed);
                     *decodedKeyCode = &modifierTranslation[i];
                     foundEntry = 1;
                     break;
@@ -123,7 +186,8 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
             // Key was released. Send key released sequence to Amiga.
             for (uint8_t i = 0; i < MODIFIER_TO_AMIGA_ENTERIES; i++) {
                 if (previousRawKeyCodeReport.modifierKeys == modifierTranslation[i].rawKeyCode) {
-                    keyboard_sendKey(modifierTranslation[i].amigaKeyCode, kbKeyReleased);
+                    //keyboard_sendKey(modifierTranslation[i].amigaKeyCode, kbKeyReleased);
+                    keyboard_queueKey(modifierTranslation[i].amigaKeyCode, kbKeyReleased);
                     break;
                 }
             }
@@ -142,7 +206,8 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
                 // Key was pressed. Send key pressed sequence to Amiga.            
                 for (uint8_t j = 0; j < KEYCODE_TO_AMIGA_ENTERIES; j++) {
                     if (rawKeyCodeReport->keyCodes[i] == keycodeTranslation[j].rawKeyCode) {
-                        keyboard_sendKey(keycodeTranslation[j].amigaKeyCode, kbKeyPressed);
+                        //keyboard_sendKey(keycodeTranslation[j].amigaKeyCode, kbKeyPressed);
+                        keyboard_queueKey(keycodeTranslation[j].amigaKeyCode, kbKeyPressed);
                         *decodedKeyCode = &keycodeTranslation[j];
                         foundEntry = 1;
                         break;
@@ -152,7 +217,8 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
                 // Key was released. Send key released sequence to Amiga.
                 for (uint8_t j = 0; j < KEYCODE_TO_AMIGA_ENTERIES; j++) {
                     if (previousRawKeyCodeReport.keyCodes[i] == keycodeTranslation[j].rawKeyCode) {
-                        keyboard_sendKey(keycodeTranslation[j].amigaKeyCode, kbKeyReleased);
+                        //keyboard_sendKey(keycodeTranslation[j].amigaKeyCode, kbKeyReleased);
+                        keyboard_queueKey(keycodeTranslation[j].amigaKeyCode, kbKeyReleased);
                         break;
                     }
                 }

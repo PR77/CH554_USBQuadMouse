@@ -165,7 +165,7 @@
     {KEY_E,             AMIGA_E        , 'E'}, /* E            */  \
     {KEY_R,             AMIGA_R        , 'R'}, /* R            */  \
     {KEY_T,             AMIGA_T        , 'T'}, /* T            */  \
-    {KEY_Z,             AMIGA_Y        , 'Z'}, /* Z            */  \
+    {KEY_Z,             AMIGA_Z        , 'Z'}, /* Z            */  \
     {KEY_U,             AMIGA_U        , 'U'}, /* U            */  \
     {KEY_I,             AMIGA_I        , 'I'}, /* I            */  \
     {KEY_O,             AMIGA_O        , 'O'}, /* O            */  \
@@ -195,7 +195,7 @@
     {KEY_KP6,           AMIGA_NP_6     , '6'}, /* 6            */  \
     {KEY_KPPLUS,        AMIGA_NP_PLUS  , '+'}, /* +            */  \
     {KEY_102ND,         AMIGA_KEY_30   , '<'}, /* <            */  \
-    {KEY_Y,             AMIGA_Z        , 'Y'}, /* Y            */  \
+    {KEY_Y,             AMIGA_Y        , 'Y'}, /* Y            */  \
     {KEY_X,             AMIGA_X        , 'X'}, /* X            */  \
     {KEY_C,             AMIGA_C        , 'C'}, /* C            */  \
     {KEY_V,             AMIGA_V        , 'V'}, /* V            */  \
