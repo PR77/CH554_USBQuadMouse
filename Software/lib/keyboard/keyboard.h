@@ -73,6 +73,7 @@ typedef enum {
 
 //static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
 static void keyboard_queueKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
+static inline uint8_t keyboard_findKeyCodeInReport(devTypeKeyboardPayload_s *rawKeyCodeReport, uint8_t keyCode);
 void keyboard_initialise(void);
 void keyboard_deinitialise(void);
 void keyboard_cyclicHanlder(void);
