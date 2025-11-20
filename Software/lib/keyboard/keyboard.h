@@ -71,9 +71,6 @@ typedef enum {
     kbResetAsserted
 } keyboardReset_e;
 
-//static void keyboard_sendKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
-static void keyboard_queueKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
-static inline uint8_t keyboard_findKeyCodeInReport(devTypeKeyboardPayload_s *rawKeyCodeReport, uint8_t keyCode);
 void keyboard_initialise(void);
 void keyboard_deinitialise(void);
 void keyboard_cyclicHanlder(void);
@@ -81,5 +78,7 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
 keyboardReset_e keyboard_translateReset(uint8_t rawModifierCode);
 keyboardStatus_e keyboard_getStatus(void);
 keyboardInUse_e keyboard_getInUse(void);
+static void keyboard_queueKey(uint8_t amigaKeyCode, keyboardKey_e pressedReleased);
+static inline uint8_t keyboard_findKeyCodeInReport(devTypeKeyboardPayload_s *rawKeyCodeReport, uint8_t keyCode);
 
 #endif // __CH554_KEYBOARD_H__
