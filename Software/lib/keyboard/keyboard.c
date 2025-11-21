@@ -17,7 +17,6 @@
 #include "keyboard_layout.h"
 #include "system.h"
 #include "tick.h"
-
 #include "serial.h"
 
 SBIT(KBCLOCK, KBCLOCK_PORT, KBCLOCK_PIN);
@@ -151,6 +150,8 @@ uint8_t keyboard_translateKey(devTypeKeyboardPayload_s *rawKeyCodeReport, const 
     if (NULL == decodedKeyCode) {
         return (0);
     }
+
+    *decodedKeyCode = NULL;
     
     if (rawKeyCodeReport->modifierKeys != previousRawKeyCodeReport.modifierKeys) {
         // Check if there has been a modifier key pressed or released. Modifier key
@@ -250,7 +251,7 @@ keyboardStatus_e keyboard_getStatus(void) {
 
 keyboardInUse_e keyboard_getInUse(void) {
 
-    keyboardStatus_e keyboardInUse = (KBINUSE) ? kbInUseOn : kbInUseOff;
+    keyboardInUse_e keyboardInUse = (KBINUSE) ? kbInUseOn : kbInUseOff;
 
     return (keyboardInUse);
 }
