@@ -21,7 +21,7 @@ static __xdata char buttonString[4];
 
 void mouse_initialise(void) {
     buttons_initialise(invertButtons);
-    quadrature_initialise(encodingRate2000Hz);
+    quadrature_initialise(encodingRate4000Hz);
 
     memset(&previousRawMouseReport, 0, sizeof(devTypeMousePayload_s));
     strncpy(buttonString, "---", sizeof(buttonString));
@@ -33,8 +33,9 @@ void mouse_deinitialise(void) {
 
 uint8_t mouse_translateMovement(devTypeMousePayload_s *rawMouseReport) {
 
+    int8_t movementAmount = 0;
     uint8_t movementUpdate = 0;
-
+    
     // NULL pointer check - this function is called with the address of RxBuffer
     // and need to ensure this buffer is not at 0.
     if (NULL == rawMouseReport) {
@@ -42,19 +43,22 @@ uint8_t mouse_translateMovement(devTypeMousePayload_s *rawMouseReport) {
     }
 
     if (rawMouseReport->xAxisMovement != previousRawMouseReport.xAxisMovement) {
-        previousRawMouseReport.xAxisMovement = rawMouseReport->xAxisMovement;
+        movementAmount = (rawMouseReport->xAxisMovement) / MOVEMENT_FILTER;
+        previousRawMouseReport.xAxisMovement = movementAmount;
         quadrature_updateCounts(QUADRATURE_X_CHANNEL, previousRawMouseReport.xAxisMovement);
         movementUpdate = 1;
     }
 
     if (rawMouseReport->yAxisMovement != previousRawMouseReport.yAxisMovement) {
-        previousRawMouseReport.yAxisMovement = rawMouseReport->yAxisMovement;
+        movementAmount = (rawMouseReport->yAxisMovement) / MOVEMENT_FILTER;
+        previousRawMouseReport.yAxisMovement = movementAmount;
         quadrature_updateCounts(QUADRATURE_Y_CHANNEL, previousRawMouseReport.yAxisMovement);
         movementUpdate = 1;
     }
 
     if (rawMouseReport->buttonState & MOUSE_BUTTON_LEFT) {
         buttons_leftButton(1);
+
     } else {
         buttons_leftButton(0);
     }

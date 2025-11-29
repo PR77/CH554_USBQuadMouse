@@ -21,9 +21,11 @@ SBIT(QUADRATURE_XB, QUADRATURE_XB_PORT, QUADRATURE_XB_PIN);
 SBIT(QUADRATURE_YA, QUADRATURE_YA_PORT, QUADRATURE_YA_PIN);
 SBIT(QUADRATURE_YB, QUADRATURE_YB_PORT, QUADRATURE_YB_PIN);
 
+#undef QUADRATURE_DEBUG_ENABLED
+
 static const uint8_t QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS][QUADRATURE_SEQUENCE_STEPS] = {
-    {QUADRATURE_HIGH, QUADRATURE_HIGH, QUADRATURE_LOW, QUADRATURE_LOW},
-    {QUADRATURE_HIGH, QUADRATURE_LOW, QUADRATURE_LOW, QUADRATURE_HIGH}
+    {QUADRATURE_LOW, QUADRATURE_HIGH, QUADRATURE_HIGH, QUADRATURE_LOW},
+    {QUADRATURE_LOW, QUADRATURE_LOW, QUADRATURE_HIGH, QUADRATURE_HIGH}
 };
 
 static quadratureOutput_s quadratureOutputs[QUADRATURE_CHANNELS];
@@ -32,9 +34,11 @@ void quadrature_timer2Interrupt(void) __interrupt(INT_NO_TMR2) {
 
     TF2 = 0;
     
-    for (uint8_t i = 0; i < QUADRATURE_CHANNELS; i++) {
-        quadrature_channelUpdate(&quadratureOutputs[i]);
-    }
+    // X Axis processing
+    quadrature_channelUpdate(&quadratureOutputs[0]);
+
+    // Y Axis processing
+    quadrature_channelUpdate(&quadratureOutputs[1]);
 }
 
 void quadrature_initialise(encodingRate_e encodingRate) {
@@ -114,19 +118,27 @@ void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
 
     quadrature_stopEncoding();
 
-    if ((counts > 0) && (counts < INT8_MAX)) {
-        if (quadratureOutputs[channelIndex].direction == QUADRATURE_BACKWARD) {
-            quadratureOutputs[channelIndex].direction = QUADRATURE_FORWARD;
-            quadratureOutputs[channelIndex].directionChange = 1;
-        }
+    if ((counts > 0) && (quadratureOutputs[channelIndex].direction == QUADRATURE_BACKWARD)) {
+        quadratureOutputs[channelIndex].direction = QUADRATURE_FORWARD;
+        quadratureOutputs[channelIndex].directionChange = 1;
     }
 
-    if ((counts > INT8_MIN) && (counts < 0)) {
-        if (quadratureOutputs[channelIndex].direction == QUADRATURE_FORWARD) {
-            quadratureOutputs[channelIndex].direction = QUADRATURE_BACKWARD;
-            quadratureOutputs[channelIndex].directionChange = 1;
-        }
+    if ((counts < 0) && (quadratureOutputs[channelIndex].direction == QUADRATURE_FORWARD)) {
+        quadratureOutputs[channelIndex].direction = QUADRATURE_BACKWARD;
+        quadratureOutputs[channelIndex].directionChange = 1;
     }
+
+#if defined(QUADRATURE_DEBUG_ENABLED)
+    serial_printString("Ch #: ");
+    serial_printHexByte(channelIndex);
+    serial_printString(", Dir: ");
+    serial_printHexByte(quadratureOutputs[channelIndex].direction);
+    serial_printString(", Counts: ");
+    serial_printHexByte(abs(counts));
+    serial_printCharacter('\n');
+#endif
+
+    quadratureOutputs[channelIndex].sequenceCounts += abs(counts);
 
     if (quadratureOutputs[channelIndex].directionChange == 1) {
         quadratureOutputs[channelIndex].directionChange = 0;
@@ -135,10 +147,7 @@ void quadrature_updateCounts(uint8_t channelIndex, int8_t counts) {
 #if defined(QUADRATURE_COUNT_RESET_ON_DIRECTION_CHANGE)
         quadratureOutputs[channelIndex].sequenceCounts = 0;
 #endif
-        return;    
     }
-
-    quadratureOutputs[channelIndex].sequenceCounts += abs(counts);
 
     quadrature_startEncoding();
 }
@@ -147,9 +156,13 @@ uint8_t quadrature_getCounts(uint8_t channelIndex) {
     
     uint8_t channelSequenceCount = 0;
 
+    quadrature_stopEncoding();
+
     if (channelIndex < QUADRATURE_CHANNELS) {
         channelSequenceCount = quadratureOutputs[channelIndex].sequenceCounts;
     }
+
+    quadrature_startEncoding();
 
     return (channelSequenceCount);
 }
@@ -159,7 +172,7 @@ static void quadrature_channelUpdate(quadratureOutput_s *quadratureOutput) {
     uint8_t currentSequenceIndex = 0, currentChannelIndex = 0;
 
     // NULL pointer check
-    if (!quadratureOutput) {
+    if (NULL == quadratureOutput) {
         return;
     }
 
@@ -170,13 +183,6 @@ static void quadrature_channelUpdate(quadratureOutput_s *quadratureOutput) {
         return;
     }
 
-    currentSequenceIndex = quadratureOutput->sequenceIndex;
-
-    // Sequence index check
-    if (currentSequenceIndex >= QUADRATURE_SEQUENCE_STEPS) {
-        return;
-    }
-
     // Sequence counts check
     if (quadratureOutput->sequenceCounts) {
         quadratureOutput->sequenceCounts--;
@@ -184,23 +190,15 @@ static void quadrature_channelUpdate(quadratureOutput_s *quadratureOutput) {
         return;
     }
 
-    if (currentChannelIndex == QUADRATURE_X_CHANNEL) {
-        QUADRATURE_XB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
-        QUADRATURE_XA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
-    } else if (currentChannelIndex == QUADRATURE_Y_CHANNEL) {
-        QUADRATURE_YB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
-        QUADRATURE_YA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
-    } else {
-        return;
-    }
+    currentSequenceIndex = quadratureOutput->sequenceIndex;
 
-    if (quadratureOutputs->direction == QUADRATURE_FORWARD) {
-        if ((currentSequenceIndex + 1) >= QUADRATURE_SEQUENCE_STEPS) {
+    if (quadratureOutput->direction == QUADRATURE_FORWARD) {
+        currentSequenceIndex++;
+
+        if (currentSequenceIndex == QUADRATURE_SEQUENCE_STEPS) {
             currentSequenceIndex = 0;
-        } else {
-            currentSequenceIndex++;
         }
-    } else if (quadratureOutputs->direction == QUADRATURE_BACKWARD) {
+    } else if (quadratureOutput->direction == QUADRATURE_BACKWARD) {
         if (currentSequenceIndex == 0) {
             currentSequenceIndex = (QUADRATURE_SEQUENCE_STEPS - 1);
         } else {
@@ -210,5 +208,15 @@ static void quadrature_channelUpdate(quadratureOutput_s *quadratureOutput) {
         return;
     }
 
+    if (currentChannelIndex == QUADRATURE_X_CHANNEL) {
+        QUADRATURE_XA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
+        QUADRATURE_XB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
+    }
+    
+    if (currentChannelIndex == QUADRATURE_Y_CHANNEL) {
+        QUADRATURE_YA = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_A_INDEX][currentSequenceIndex];
+        QUADRATURE_YB = QUADRATURE_SEQUENCE[QUADRATURE_CHANNELS_B_INDEX][currentSequenceIndex];
+    } 
+    
     quadratureOutput->sequenceIndex = currentSequenceIndex;
 }

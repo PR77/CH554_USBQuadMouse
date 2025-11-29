@@ -13,6 +13,8 @@
 #include <stdint.h>
 #include "ch554.h"
 
+#define MOVEMENT_FILTER     1
+
 /**
  * Mouse button masks - used for the first byte in the HID report.
  */
