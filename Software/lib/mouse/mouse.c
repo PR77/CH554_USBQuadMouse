@@ -21,7 +21,7 @@ static __xdata char buttonString[4];
 
 void mouse_initialise(void) {
     buttons_initialise(invertButtons);
-    quadrature_initialise(encodingRate4000Hz);
+    quadrature_initialise(encodingRate8000Hz);
 
     memset(&previousRawMouseReport, 0, sizeof(devTypeMousePayload_s));
     strncpy(buttonString, "---", sizeof(buttonString));
@@ -43,16 +43,16 @@ uint8_t mouse_translateMovement(devTypeMousePayload_s *rawMouseReport) {
     }
 
     if (rawMouseReport->xAxisMovement != previousRawMouseReport.xAxisMovement) {
-        movementAmount = (rawMouseReport->xAxisMovement) / MOVEMENT_FILTER;
-        previousRawMouseReport.xAxisMovement = movementAmount;
-        quadrature_updateCounts(QUADRATURE_X_CHANNEL, previousRawMouseReport.xAxisMovement);
+        previousRawMouseReport.xAxisMovement = rawMouseReport->xAxisMovement;
+        movementAmount = (rawMouseReport->xAxisMovement) / DPI_MOVEMENT_FILTER;
+        quadrature_updateCounts(QUADRATURE_X_CHANNEL, movementAmount);
         movementUpdate = 1;
     }
 
     if (rawMouseReport->yAxisMovement != previousRawMouseReport.yAxisMovement) {
-        movementAmount = (rawMouseReport->yAxisMovement) / MOVEMENT_FILTER;
-        previousRawMouseReport.yAxisMovement = movementAmount;
-        quadrature_updateCounts(QUADRATURE_Y_CHANNEL, previousRawMouseReport.yAxisMovement);
+        previousRawMouseReport.yAxisMovement = rawMouseReport->yAxisMovement;
+        movementAmount = (rawMouseReport->yAxisMovement) / DPI_MOVEMENT_FILTER;
+        quadrature_updateCounts(QUADRATURE_Y_CHANNEL, movementAmount);
         movementUpdate = 1;
     }
 
